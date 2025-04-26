@@ -20,8 +20,8 @@ export function createStyles()
                 },
                 web: {
                     position: 'absolute',
-                    right: 60,
-                    top: 0,
+                    right: 30,
+                    top: -2,
                     height: 48,
                     justifyContent: 'center',
                 },

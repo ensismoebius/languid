@@ -1,31 +1,74 @@
-import { Platform, StyleSheet } from "react-native";
+import { Dimensions, Platform, StyleSheet } from "react-native";
 
-export function createStyles()
+export function createStyles(headerHeight)
 {
     return StyleSheet.create({
-        wrapper: {
-            backgroundColor: '#1e1e1e',
-            flex: 1,  // Changed from height: '60%'
-            borderRadius: 5,
-        },
         container: {
-            flex: 1,  // This will now fill the wrapper completely
-            justifyContent: 'center',
-            padding: 12,
-            minHeight: 400,
-            flexDirection: 'column',
+            flex: 1,
+            padding: 5,
         },
-        // ... rest of your styles remain the same
-        button: {
-            backgroundColor: '#007BFF',
+        header: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
             padding: 10,
+            backgroundColor: 'orange',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1,
+        },
+        button: {
+            padding: 10,
+            backgroundColor: '#f00',
             borderRadius: 5,
             maxHeight: 50,
-            width: '50%',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginRight: 10,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.7,
+            shadowRadius: 5,
+            elevation: 5,
         },
-        listView: {
-            flex: 1,
-            backgroundColor: 'orange',
+        buttonText: {
+            color: '#fff',
+            fontSize: 16,
+            fontWeight: 'bold',
+        },
+        exerciseItem: {
+            padding: 10,
+            marginLeft: 10,
+            backgroundColor: '#eee',
+            borderRadius: 5,
+            alignItems: 'center',
+            justifyContent: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.7,
+            shadowRadius: 5,
+            elevation: 5,
+        },
+        selectedExercise: {
+            backgroundColor: '#4CAF50',
+        },
+        exerciseText: {
+            color: '#333',
+            fontWeight: 'bold',
+        },
+        exerciseCounter: {
+            color: '#fff',
+            fontWeight: 'bold',
+            marginLeft: 10,
+        },
+        flatListContent: {
+            paddingRight: 15,
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            maxHeight: 50,
             marginLeft: 3,
             marginBottom: 3,
             marginRight: 3,
@@ -34,16 +77,40 @@ export function createStyles()
             width: '50%',
             maxHeight: 50,
         },
-        instructions: {
-            height: '40%',
+        scrollView: {
+            flex: 1,
+            marginTop: headerHeight,
+        },
+        scrollContent: {
+            paddingBottom: 20,
         },
         inputCode: {
             color: 'white',
             fontFamily: Platform.select({ ios: 'Courier', android: 'monospace' }),
-            padding: 10,
-            minHeight: 400,
+            padding: 15,
+            minHeight: Dimensions.get('window').height * 0.7 - 100,
             textAlignVertical: 'top',
-            marginTop: 3,
+            backgroundColor: '#1e1e1e',
+            borderRadius: 10,
+            borderWidth: 1,
+            borderColor: '#ffffff30',
+            fontSize: 16,
+            lineHeight: 24,
+        },
+        instructions: {
+            width: '100%',
+            padding: 15,
+            marginTop: 10,
+            color: '#333',
+            borderRadius: 10,
+            backgroundColor: 'white',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.7,
+            shadowRadius: 5,
+            elevation: 5,
+            fontSize: 16,
+            lineHeight: 24,
         },
     });
 }
