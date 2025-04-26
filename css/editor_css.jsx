@@ -32,6 +32,7 @@ export function createStyles(headerHeight)
             shadowOpacity: 0.7,
             shadowRadius: 5,
             elevation: 5,
+            width: '30%',
         },
         buttonText: {
             color: '#fff',
@@ -111,6 +112,35 @@ export function createStyles(headerHeight)
             elevation: 5,
             fontSize: 16,
             lineHeight: 24,
+        },
+        consoleContainer: {
+            backgroundColor: '#1e1e1e',
+            borderRadius: 10,
+            borderWidth: 1,
+            borderColor: '#ffffff30',
+            marginBottom: 10,
+        },
+        consoleHeader: {
+            backgroundColor: '#333',
+            padding: 10,
+            borderTopLeftRadius: 10,
+            borderTopRightRadius: 10,
+        },
+        consoleTitle: {
+            color: '#fff',
+            fontWeight: 'bold',
+        },
+        consoleOutput: {
+            maxHeight: 150,
+            padding: 10,
+        },
+        consoleContent: {
+            flexGrow: 1,
+        },
+        consoleText: {
+            color: '#fff',
+            fontFamily: Platform.select({ ios: 'Courier', android: 'monospace' }),
+            fontSize: 14,
         },
     });
 }

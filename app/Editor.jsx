@@ -7,7 +7,8 @@ import
     FlatList,
     ScrollView,
     TextInput,
-    Keyboard
+    Keyboard,
+    ActivityIndicator
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { createStyles } from '../css/editor_css';
@@ -25,6 +26,9 @@ export default function Editor()
     const [selection, setSelection] = useState({ start: 0, end: 0 });
     const [code, setCode] = useState('// Digite seu código abaixo');
     const [currentExercise, setCurrentExercise] = useState(0);
+    const [showConsole, setShowConsole] = useState(false);
+    const [executing, setExecuting] = useState(false);
+    const [consoleOutput, setConsoleOutput] = useState('');
 
     const handleKeyPress = ({ nativeEvent }) =>
     {
@@ -48,12 +52,53 @@ export default function Editor()
         Keyboard.dismiss();
     };
 
-    const handleRunCode = () =>
+    async function handleRunCode()
     {
-        // Here you would implement your code execution logic
-        console.log('Executing code:', code);
-        // For demo purposes, we'll just show an alert
-        alert('Código executado! Verifique o console para detalhes.');
+
+        setExecuting(true);
+
+        // Erase when implemented
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        await delay(2000); // 2-second delay
+
+        // Simple code execution simulation
+        try
+        {
+            // This is just a simulation - in a real app you'd need a proper JS interpreter
+            let output = '';
+
+            // Check for common patterns in the code
+            if (code.includes('return 0'))
+            {
+                output = 'Program executed successfully. Return value: 0';
+            } else if (code.includes('console.log'))
+            {
+                output = 'Hello World!'; // Default console.log output
+            } else
+            {
+                output = 'Code executed (simulated). No output generated.';
+            }
+
+            setConsoleOutput(output);
+            setShowConsole(true);
+
+            // Scroll to bottom to show console output
+            setTimeout(() =>
+            {
+                if (this.consoleScrollView)
+                {
+                    this.consoleScrollView.scrollToEnd({ animated: true });
+                }
+            }, 100);
+
+        } catch (error)
+        {
+            setConsoleOutput(`Error: ${error.message}`);
+            setShowConsole(true);
+        } finally
+        {
+            setExecuting(false);
+        }
     };
 
     return (
@@ -69,7 +114,10 @@ export default function Editor()
                     style={styles.button}
                     onPress={handleRunCode}
                 >
-                    <Text style={styles.buttonText}>Executar</Text>
+                    {executing ?
+                        (<ActivityIndicator size="small" color="#fff" />) :
+                        (<Text style={styles.buttonText}>Executar</Text>)
+                    }
                 </TouchableOpacity>
 
                 <FlatList
@@ -115,6 +163,21 @@ export default function Editor()
                     onKeyPress={handleKeyPress}
                     selection={selection}
                 />
+
+                {showConsole && (
+                    <View style={styles.consoleContainer}>
+                        <View style={styles.consoleHeader}>
+                            <Text style={styles.consoleTitle}>Console Output</Text>
+                        </View>
+                        <ScrollView
+                            ref={ref => this.consoleScrollView = ref}
+                            style={styles.consoleOutput}
+                            contentContainerStyle={styles.consoleContent}
+                        >
+                            <Text style={styles.consoleText}>{consoleOutput}</Text>
+                        </ScrollView>
+                    </View>
+                )}
 
                 <TextInput
                     style={styles.instructions}
