@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import
 {
     View,
@@ -13,15 +13,21 @@ import
 import { LinearGradient } from 'expo-linear-gradient';
 import { createStyles } from '../css/editor_css';
 
+const API_URL = "http://192.168.0.5/languid/api.php";
+// Consider using environment variables for sensitive data
+// const API_KEY = process.env.API_KEY || "re98wr6ew8r6rew76r89e6rwer6w98r6ywe9r6r6w87e9wr6ew06r7";
+const API_KEY = "re98wr6ew8r6rew76r89e6rwer6w98r6ywe9r6r6w87e9wr6ew06r7";
+
+const exercises = [
+    { id: 1, title: 'Exe 01', instruction: 'Crie a função principal e a faça retornar 0' },
+    { id: 2, title: 'Exe 02', instruction: 'Implemente uma função que soma dois números' }
+];
+
 export default function Editor()
 {
-    const exercises = [
-        { id: 1, title: 'Exe 01', instruction: 'Crie a função principal e a faça retornar 0' },
-        { id: 2, title: 'Exe 02', instruction: 'Implemente uma função que soma dois números' }
-    ];
-
     const headerHeight = 80;
     const styles = createStyles(headerHeight);
+    const consoleScrollViewRef = useRef(null);
 
     const [selection, setSelection] = useState({ start: 0, end: 0 });
     const [code, setCode] = useState('// Digite seu código abaixo');
@@ -49,55 +55,55 @@ export default function Editor()
     {
         setCurrentExercise(index);
         setCode('// Digite seu código abaixo');
+        setShowConsole(false);
         Keyboard.dismiss();
     };
 
-    async function handleRunCode()
+    const handleRunCode = async () =>
     {
+        if (executing) return;
 
         setExecuting(true);
+        setShowConsole(true);
 
-        // Erase when implemented
-        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-        await delay(2000); // 2-second delay
-
-        // Simple code execution simulation
         try
         {
-            // This is just a simulation - in a real app you'd need a proper JS interpreter
-            let output = '';
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-API-KEY": API_KEY,
+                },
+                body: JSON.stringify({
+                    code: code,
+                    exercise: exercises[currentExercise].id
+                }),
+            });
 
-            // Check for common patterns in the code
-            if (code.includes('return 0'))
+            if (!response.ok)
             {
-                output = 'Program executed successfully. Return value: 0';
-            } else if (code.includes('console.log'))
-            {
-                output = 'Hello World!'; // Default console.log output
-            } else
-            {
-                output = 'Code executed (simulated). No output generated.';
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            setConsoleOutput(output);
-            setShowConsole(true);
+            const jsonData = await response.json();
 
-            // Scroll to bottom to show console output
-            setTimeout(() =>
+            if (jsonData.status === 'error' || jsonData.status === 'fail')
             {
-                if (this.consoleScrollView)
-                {
-                    this.consoleScrollView.scrollToEnd({ animated: true });
-                }
-            }, 100);
-
+                setConsoleOutput(`Error: ${jsonData.message}`);
+            } else
+            {
+                setConsoleOutput(jsonData.message);
+            }
         } catch (error)
         {
             setConsoleOutput(`Error: ${error.message}`);
-            setShowConsole(true);
         } finally
         {
             setExecuting(false);
+            setTimeout(() =>
+            {
+                consoleScrollViewRef.current?.scrollToEnd({ animated: true });
+            }, 100);
         }
     };
 
@@ -113,11 +119,13 @@ export default function Editor()
                 <TouchableOpacity
                     style={styles.button}
                     onPress={handleRunCode}
+                    disabled={executing}
                 >
-                    {executing ?
-                        (<ActivityIndicator size="small" color="#fff" />) :
-                        (<Text style={styles.buttonText}>Executar</Text>)
-                    }
+                    {executing ? (
+                        <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                        <Text style={styles.buttonText}>Executar</Text>
+                    )}
                 </TouchableOpacity>
 
                 <FlatList
@@ -170,7 +178,7 @@ export default function Editor()
                             <Text style={styles.consoleTitle}>Console Output</Text>
                         </View>
                         <ScrollView
-                            ref={ref => this.consoleScrollView = ref}
+                            ref={consoleScrollViewRef}
                             style={styles.consoleOutput}
                             contentContainerStyle={styles.consoleContent}
                         >
@@ -191,4 +199,4 @@ export default function Editor()
             </ScrollView>
         </LinearGradient>
     );
-};
+}
