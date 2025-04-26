@@ -6,7 +6,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 header("Content-Type: application/json"); // Define o tipo de conteúdo da resposta como JSON
 
 // Define uma chave secreta para a API
-define("API_KEY", "re98wr6ew8r6rew76r89e6rwer6w98r6ywe9r6r6w87e9wr6ew06r7"); // A chave de API que será usada para validar as requisições
+define("API_KEY", "re98wr6ew8r6rew76r89e6rwer6w98r6ywe9r6r6w87e9wr6ew06r7"); // A chave de API que será usada para validar as requisições 
 
 // Manipular requisição OPTIONS (preflight)
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { // Verifica se a requisição é do tipo OPTIONS (usado para CORS pré-vôo)
@@ -21,7 +21,7 @@ $receivedKey = $headers['X-API-KEY'] ?? $headers['x-api-key'] ?? ''; // Obtém a
 if ($receivedKey !== API_KEY) { // Verifica se a chave recebida é diferente da chave definida
     http_response_code(403); // Retorna código de erro 403 (Proibido) se a chave for inválida
     echo json_encode(["status" => "error", "message" => "Forbidden: Invalid API Key"]); // Retorna mensagem de erro em JSON
-    exit; // Finaliza a execução da API
+    exit; // Finaliza a execução da API 
 }
 
 // Manipular requisição POST

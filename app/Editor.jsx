@@ -13,7 +13,7 @@ import
 import { LinearGradient } from 'expo-linear-gradient';
 import { createStyles } from '../css/editor_css';
 
-const API_URL = "http://192.168.0.5/languid/api.php";
+const API_URL = "http://192.168.0.5/languid/serverAPI/api.php";
 // Consider using environment variables for sensitive data
 // const API_KEY = process.env.API_KEY || "re98wr6ew8r6rew76r89e6rwer6w98r6ywe9r6r6w87e9wr6ew06r7";
 const API_KEY = "re98wr6ew8r6rew76r89e6rwer6w98r6ywe9r6r6w87e9wr6ew06r7";
@@ -65,6 +65,8 @@ export default function Editor()
 
         setExecuting(true);
         setShowConsole(true);
+        setConsoleOutput("Executando...");
+        Keyboard.dismiss();
 
         try
         {
