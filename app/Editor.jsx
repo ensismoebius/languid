@@ -12,6 +12,7 @@ import
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { createStyles } from '../css/editor_css';
+import Header from '../components/Header';
 
 const API_URL = "http://192.168.0.5/languid/serverAPI/api.php";
 // Consider using environment variables for sensitive data
@@ -19,8 +20,8 @@ const API_URL = "http://192.168.0.5/languid/serverAPI/api.php";
 const API_KEY = "re98wr6ew8r6rew76r89e6rwer6w98r6ywe9r6r6w87e9wr6ew06r7";
 
 const exercises = [
-    { id: 1, title: 'Exe 01', instruction: 'Crie a função principal e a faça retornar 0' },
-    { id: 2, title: 'Exe 02', instruction: 'Implemente uma função que soma dois números' }
+    { id: 1, title: 'Exe 01', instruction: 'Crie a função principal e a faça retornar 0', done: false },
+    { id: 2, title: 'Exe 02', instruction: 'Implemente uma função que soma dois números', done: false },
 ];
 
 export default function Editor()
@@ -116,43 +117,15 @@ export default function Editor()
             end={{ x: 1, y: 1 }}
             style={styles.container}
         >
-            {/* Header Section */}
-            <View style={[styles.header, { height: headerHeight }]}>
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={handleRunCode}
-                    disabled={executing}
-                >
-                    {executing ? (
-                        <ActivityIndicator size="small" color="#fff" />
-                    ) : (
-                        <Text style={styles.buttonText}>Executar</Text>
-                    )}
-                </TouchableOpacity>
-
-                <FlatList
-                    data={exercises}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={({ item, index }) => (
-                        <TouchableOpacity
-                            style={[
-                                styles.exerciseItem,
-                                currentExercise === index && styles.selectedExercise
-                            ]}
-                            onPress={() => handleExerciseSelect(index)}
-                        >
-                            <Text style={styles.exerciseText}>{item.title}</Text>
-                        </TouchableOpacity>
-                    )}
-                    keyExtractor={(item) => item.id.toString()}
-                    contentContainerStyle={styles.flatListContent}
-                />
-
-                <Text style={styles.exerciseCounter}>
-                    {currentExercise + 1}/{exercises.length}
-                </Text>
-            </View>
+            <Header
+                styles={styles}
+                headerHeight={headerHeight}
+                handleRunCode={handleRunCode}
+                executing={executing}
+                exercises={exercises}
+                currentExercise={currentExercise}
+                handleExerciseSelect={handleExerciseSelect}
+            />
 
             {/* Editor and Instructions Section */}
             <ScrollView
