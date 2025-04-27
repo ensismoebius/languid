@@ -1,7 +1,7 @@
 <?php
 require_once('CodeTester.php');
 
-class APIHandler
+class APIExercisesHandler
 {
     const API_KEY = "re98wr6ew8r6rew76r89e6rwer6w98r6ywe9r6r6w87e9wr6ew06r7";
 
@@ -72,6 +72,6 @@ class APIHandler
 }
 
 // Instantiate and handle the request
-$apiHandler = new APIHandler();
-$apiHandler->handleRequest();
+$apiExercisesHandler = new APIExercisesHandler();
+$apiExercisesHandler->handleRequest();
 

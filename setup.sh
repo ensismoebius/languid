@@ -32,5 +32,39 @@ if ! groups | grep -q '\bdocker\b'; then
   echo "You need to log out and log back in for Docker group changes to take effect."
 fi
 
+# Add MySQL database creation script
+cat <<EOL > create_database.sql
+CREATE DATABASE IF NOT EXISTS code_testing;
+USE code_testing;
+
+CREATE TABLE IF NOT EXISTS exercise (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    instructions TEXT NOT NULL,
+    testFileName VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS user (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    passwdHash VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS user_exercise (
+    loginId INT NOT NULL,
+    exerciseId INT NOT NULL,
+    done BOOLEAN DEFAULT FALSE,
+    PRIMARY KEY (loginId, exerciseId),
+    FOREIGN KEY (loginId) REFERENCES user(id),
+    FOREIGN KEY (exerciseId) REFERENCES exercise(id)
+);
+EOL
+
+# Execute the SQL script to create the database and tables
+sudo mysql < create_database.sql
+
+# Clean up the SQL script
+rm create_database.sql
+
 rm Dockerfile
 # End of script
