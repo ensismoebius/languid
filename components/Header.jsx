@@ -1,39 +1,31 @@
 import React from 'react';
-import { View, TouchableOpacity, Text, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text } from 'react-native';
+import ExecutingButton from './ExecutingButton';
+import ExercisesList from './ExercisesList';
 
-export default function Header({ styles, headerHeight, handleRunCode, executing, exercises, currentExercise, handleExerciseSelect })
+export default function Header({ styles, headerHeight, handleRunCode, executing, exercises, currentExercise })
 {
+    const handleExerciseSelect = (index) =>
+    {
+        setCurrentExercise(index);
+        setCode('// Digite seu código abaixo');
+        setShowConsole(false);
+        Keyboard.dismiss();
+    };
+
     return (
         <View style={[styles.header, { height: headerHeight }]}>
-            <TouchableOpacity
-                style={styles.button}
-                onPress={handleRunCode}
-                disabled={executing}
-            >
-                {executing ? (
-                    <ActivityIndicator size="small" color="#fff" />
-                ) : (
-                    <Text style={styles.buttonText}>Executar</Text>
-                )}
-            </TouchableOpacity>
+            <ExecutingButton
+                styles={styles}
+                handleRunCode={handleRunCode}
+                executing={executing}
+            />
 
-            <FlatList
-                data={exercises}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                renderItem={({ item, index }) => (
-                    <TouchableOpacity
-                        style={[
-                            styles.exerciseItem,
-                            currentExercise === index && styles.selectedExercise
-                        ]}
-                        onPress={() => handleExerciseSelect(index)}
-                    >
-                        <Text style={styles.exerciseText}>{item.title}</Text>
-                    </TouchableOpacity>
-                )}
-                keyExtractor={(item) => item.id.toString()}
-                contentContainerStyle={styles.flatListContent}
+            <ExercisesList
+                styles={styles}
+                exercises={exercises}
+                currentExercise={currentExercise}
+                handleExerciseSelect={handleExerciseSelect}
             />
 
             <Text style={styles.exerciseCounter}>

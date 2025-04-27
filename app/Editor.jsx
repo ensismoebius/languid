@@ -13,6 +13,8 @@ import
 import { LinearGradient } from 'expo-linear-gradient';
 import { createStyles } from '../css/editor_css';
 import Header from '../components/Header';
+import Console from '../components/Console';
+import CodeEditor from '../components/CodeEditor';
 
 const API_URL = "http://192.168.0.5/languid/serverAPI/api.php";
 // Consider using environment variables for sensitive data
@@ -36,29 +38,6 @@ export default function Editor()
     const [showConsole, setShowConsole] = useState(false);
     const [executing, setExecuting] = useState(false);
     const [consoleOutput, setConsoleOutput] = useState('');
-
-    const handleKeyPress = ({ nativeEvent }) =>
-    {
-        if (nativeEvent.key === 'Tab')
-        {
-            nativeEvent.preventDefault?.();
-            const before = code.slice(0, selection.start);
-            const after = code.slice(selection.end);
-            const newText = before + '    ' + after;
-            const newCursorPos = selection.start + 4;
-
-            setCode(newText);
-            setSelection({ start: newCursorPos, end: newCursorPos });
-        }
-    };
-
-    const handleExerciseSelect = (index) =>
-    {
-        setCurrentExercise(index);
-        setCode('// Digite seu código abaixo');
-        setShowConsole(false);
-        Keyboard.dismiss();
-    };
 
     const handleRunCode = async () =>
     {
@@ -124,44 +103,21 @@ export default function Editor()
                 executing={executing}
                 exercises={exercises}
                 currentExercise={currentExercise}
-                handleExerciseSelect={handleExerciseSelect}
             />
 
-            {/* Editor and Instructions Section */}
-            <ScrollView
-                style={styles.scrollView}
-                contentContainerStyle={styles.scrollContent}
-                keyboardShouldPersistTaps="handled"
-            >
-                <TextInput
-                    style={styles.inputCode}
-                    placeholderTextColor="#ffffffaa"
-                    multiline
-                    value={code}
-                    onChangeText={setCode}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    spellCheck={false}
-                    onSelectionChange={({ nativeEvent }) => setSelection(nativeEvent.selection)}
-                    onKeyPress={handleKeyPress}
-                    selection={selection}
-                />
-            </ScrollView>
+            <CodeEditor
+                styles={styles}
+                code={code}
+                setCode={setCode}
+                selection={selection}
+                setSelection={setSelection}
+            />
 
-            {showConsole && (
-                <View style={styles.consoleContainer}>
-                    <View style={styles.consoleHeader}>
-                        <Text style={styles.consoleTitle}>Console Output</Text>
-                    </View>
-                    <ScrollView
-                        ref={consoleScrollViewRef}
-                        style={styles.consoleOutput}
-                        contentContainerStyle={styles.consoleContent}
-                    >
-                        <Text style={styles.consoleText}>{consoleOutput}</Text>
-                    </ScrollView>
-                </View>
-            )}
+            <Console
+                styles={styles}
+                consoleOutput={consoleOutput}
+                showConsole={showConsole}
+            />
 
             <TextInput
                 style={styles.instructions}
