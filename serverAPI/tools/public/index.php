@@ -5,9 +5,12 @@ require_once '../vendor/autoload.php';
 
 use Doctrine\ORM\ORMSetup;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Psr\Cache\CacheItemPoolInterface;
 
 // Doctrine setup
-$config = ORMSetup::createAnnotationMetadataConfiguration([__DIR__ . '/../src/Entities'], true);
+$cache = new ArrayAdapter();
+$config = ORMSetup::createAnnotationMetadataConfiguration([__DIR__ . '/../src/Entities'], true, null, $cache);
 $conn = [
     'dbname' => 'languid',
     'user' => 'andre',
