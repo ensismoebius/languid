@@ -47,6 +47,18 @@ class APIExercisesHandler
         return $receivedKey === self::API_KEY;
     }
 
+    private function sanitizeInput($input)
+    {
+        if (is_array($input)) {
+            foreach ($input as $key => $value) {
+                $input[$key] = $this->sanitizeInput($value);
+            }
+        } else {
+            $input = htmlspecialchars(strip_tags($input));
+        }
+        return $input;
+    }
+
     private function handlePostRequest()
     {
         $input = json_decode(file_get_contents("php://input"), true);
@@ -55,6 +67,8 @@ class APIExercisesHandler
             echo json_encode(["status" => "error", "message" => "Invalid JSON data"]);
             exit;
         }
+
+        $input = $this->sanitizeInput($input);
 
         if (isset($input['username']) && isset($input['password'])) {
             $this->handleLogin($input['username'], $input['password']);

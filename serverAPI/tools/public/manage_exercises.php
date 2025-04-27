@@ -5,13 +5,35 @@ require_once '../src/db.php';
 
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
+use Doctrine\ORM\ORMSetup;
+use Doctrine\ORM\EntityManager;
+use Doctrine\DBAL\DriverManager;
+use ExerciseManager\Entities\Exercise;
+
+// Load configuration
+$config = require __DIR__ . '/../src/config.php';
+$uploadDir = $config['upload_paths']['exercises'];
+
+// Doctrine setup
+$doctrineConfig = $config['doctrine'];
+$config = ORMSetup::createAttributeMetadataConfiguration($doctrineConfig['entities_path'], $doctrineConfig['is_dev_mode']);
+
+$conn = DriverManager::getConnection([
+    'dbname' => $doctrineConfig['dbname'],
+    'user' => $doctrineConfig['user'],
+    'password' => $doctrineConfig['password'],
+    'host' => $doctrineConfig['host'],
+    'driver' => $doctrineConfig['driver'],
+]);
+
+$entityManager = EntityManager::create($conn, $config);
 
 $loader = new FilesystemLoader('../templates');
 $twig = new Environment($loader);
 
-// Fetch exercises
-$stmt = $pdo->query("SELECT * FROM exercises");
-$exercises = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Fetch exercises using Doctrine ORM
+$exerciseRepository = $entityManager->getRepository(Exercise::class);
+$exercises = $exerciseRepository->findAll();
 
 // Filter and validate form data
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -23,9 +45,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_STRING);
 
             if ($name && $description) {
-                // Handle file upload
+                $exercise = new Exercise();
+                $exercise->setName($name);
+                $exercise->setDescription($description);
+
                 if (isset($_FILES['cpp_file']) && $_FILES['cpp_file']['error'] === UPLOAD_ERR_OK) {
-                    $uploadDir = '../uploads/';
                     $fileName = basename($_FILES['cpp_file']['name']);
                     $filePath = $uploadDir . $fileName;
 
@@ -34,15 +58,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
 
                     if (move_uploaded_file($_FILES['cpp_file']['tmp_name'], $filePath)) {
-                        $stmt = $pdo->prepare("INSERT INTO exercises (name, description, cpp_file) VALUES (?, ?, ?)");
-                        $stmt->execute([$name, $description, $fileName]);
+                        $exercise->setCppFile($fileName);
                     } else {
                         echo "Error uploading file.";
                     }
-                } else {
-                    $stmt = $pdo->prepare("INSERT INTO exercises (name, description) VALUES (?, ?)");
-                    $stmt->execute([$name, $description]);
                 }
+
+                $entityManager->persist($exercise);
+                $entityManager->flush();
             } else {
                 echo "Invalid input.";
             }
@@ -52,25 +75,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_STRING);
 
             if ($id && $name && $description) {
-                // Handle file upload for edit
-                if (isset($_FILES['cpp_file']) && $_FILES['cpp_file']['error'] === UPLOAD_ERR_OK) {
-                    $uploadDir = '../uploads/';
-                    $fileName = basename($_FILES['cpp_file']['name']);
-                    $filePath = $uploadDir . $fileName;
+                $exercise = $exerciseRepository->find($id);
+                if ($exercise) {
+                    $exercise->setName($name);
+                    $exercise->setDescription($description);
 
-                    if (!is_dir($uploadDir)) {
-                        mkdir($uploadDir, 0777, true);
+                    if (isset($_FILES['cpp_file']) && $_FILES['cpp_file']['error'] === UPLOAD_ERR_OK) {
+                        $fileName = basename($_FILES['cpp_file']['name']);
+                        $filePath = $uploadDir . $fileName;
+
+                        if (!is_dir($uploadDir)) {
+                            mkdir($uploadDir, 0777, true);
+                        }
+
+                        if (move_uploaded_file($_FILES['cpp_file']['tmp_name'], $filePath)) {
+                            $exercise->setCppFile($fileName);
+                        } else {
+                            echo "Error uploading file.";
+                        }
                     }
 
-                    if (move_uploaded_file($_FILES['cpp_file']['tmp_name'], $filePath)) {
-                        $stmt = $pdo->prepare("UPDATE exercises SET name = ?, description = ?, cpp_file = ? WHERE id = ?");
-                        $stmt->execute([$name, $description, $fileName, $id]);
-                    } else {
-                        echo "Error uploading file.";
-                    }
-                } else {
-                    $stmt = $pdo->prepare("UPDATE exercises SET name = ?, description = ? WHERE id = ?");
-                    $stmt->execute([$name, $description, $id]);
+                    $entityManager->flush();
                 }
             } else {
                 echo "Invalid input.";
@@ -79,8 +104,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 
             if ($id) {
-                $stmt = $pdo->prepare("DELETE FROM exercises WHERE id = ?");
-                $stmt->execute([$id]);
+                $exercise = $exerciseRepository->find($id);
+                if ($exercise) {
+                    $entityManager->remove($exercise);
+                    $entityManager->flush();
+                }
             } else {
                 echo "Invalid input.";
             }

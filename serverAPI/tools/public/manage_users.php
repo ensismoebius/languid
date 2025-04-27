@@ -5,13 +5,26 @@ require_once '../src/db.php';
 
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\Setup;
+use Doctrine\ORM\EntityRepository;
+
+// Load configuration
+$config = require __DIR__ . '/../src/config.php';
+
+// Doctrine setup
+$doctrineConfig = $config['doctrine'];
+$config = Setup::createAnnotationMetadataConfiguration($doctrineConfig['entities_path'], $doctrineConfig['is_dev_mode']);
+$conn = $config['db'];
+
+$entityManager = EntityManager::create($conn, $config);
 
 $loader = new FilesystemLoader('../templates');
 $twig = new Environment($loader);
 
-// Fetch users
-$stmt = $pdo->query("SELECT * FROM users");
-$users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Fetch users using Doctrine ORM
+$userRepository = $entityManager->getRepository('Entities\\User');
+$users = $userRepository->findAll();
 
 // Add routes for managing users
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -21,48 +34,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($action === 'add') {
             $username = $_POST['username'];
             $email = $_POST['email'];
-            $stmt = $pdo->prepare("INSERT INTO users (username, email) VALUES (?, ?)");
-            $stmt->execute([$username, $email]);
+
+            $user = new \Entities\User();
+            $user->setUsername($username);
+            $user->setEmail($email);
+            $entityManager->persist($user);
+            $entityManager->flush();
         } elseif ($action === 'edit') {
             $id = $_POST['id'];
             $username = $_POST['username'];
             $email = $_POST['email'];
-            $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ? WHERE id = ?");
-            $stmt->execute([$username, $email, $id]);
+
+            $user = $userRepository->find($id);
+            if ($user) {
+                $user->setUsername($username);
+                $user->setEmail($email);
+                $entityManager->flush();
+            }
         } elseif ($action === 'delete') {
             $id = $_POST['id'];
-            $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
-            $stmt->execute([$id]);
+
+            $user = $userRepository->find($id);
+            if ($user) {
+                $entityManager->remove($user);
+                $entityManager->flush();
+            }
         }
 
         // Redirect to avoid form resubmission
         header('Location: manage_users.php');
         exit;
-    }
-}
-
-// Add support for importing users from a CSV file
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['import_csv'])) {
-    if (isset($_FILES['csv_file']) && $_FILES['csv_file']['error'] === UPLOAD_ERR_OK) {
-        $file = fopen($_FILES['csv_file']['tmp_name'], 'r');
-
-        // Skip the header row
-        fgetcsv($file);
-
-        while (($data = fgetcsv($file)) !== false) {
-            $username = filter_var($data[0], FILTER_SANITIZE_STRING);
-            $email = filter_var($data[1], FILTER_VALIDATE_EMAIL);
-
-            if ($username && $email) {
-                $stmt = $pdo->prepare("INSERT INTO users (username, email) VALUES (?, ?)");
-                $stmt->execute([$username, $email]);
-            }
-        }
-
-        fclose($file);
-        echo "Users imported successfully.";
-    } else {
-        echo "Error uploading file.";
     }
 }
 

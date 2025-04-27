@@ -27,6 +27,11 @@ class Exercise
      */
     private $description;
 
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $cppFile;
+
     // Getters and setters
     public function getId(): int
     {
@@ -51,5 +56,15 @@ class Exercise
     public function setDescription(string $description): void
     {
         $this->description = $description;
+    }
+
+    public function getCppFile(): ?string
+    {
+        return $this->cppFile;
+    }
+
+    public function setCppFile(?string $cppFile): void
+    {
+        $this->cppFile = $cppFile;
     }
 }
