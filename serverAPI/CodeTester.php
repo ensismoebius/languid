@@ -37,7 +37,7 @@ class CodeTester
 
         $containerName = "sandbox" . uniqid();
 
-        $dockerCmd = "docker run --rm --name $containerName -v $uploadPath:/tmp/code.cpp:ro -v $testFile:/tmp/test.cpp:ro sandbox bash -c 'g++ -std=c++20 /tmp/code.cpp /tmp/test.cpp -lgtest -lgtest_main -lpthread -o /tmp/sandbox_exec && /tmp/sandbox_exec --gtest_output=json:res.json > /dev/null 2>&1 && cat res.json'";
+        $dockerCmd = "docker run --rm --name $containerName -v $uploadPath:/tmp/code.cpp:ro -v $testFile:/tmp/test.cpp:ro sandbox bash -c 'g++ -std=c++20 /tmp/code.cpp /tmp/test.cpp -lgtest -lgtest_main -lpthread -o /tmp/sandbox_exec && /tmp/sandbox_exec --gtest_output=json:res.json > /dev/null 2>&1 || cat res.json'";
 
         $testOutput = shell_exec($dockerCmd);
 
