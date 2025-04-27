@@ -8,9 +8,23 @@ sudo apt install -y apache2 php libapache2-mod-php php-mysql php-curl php-xml ph
 # Add the www-data user to the docker group to allow it to run Docker commands
 sudo usermod -aG docker www-data
 
-# Create a Dockerfile for the container
-touch Dockerfile
-cat <<EOL > Dockerfile
+# Check if the -f flag is passed
+FORCE_REBUILD=false
+while getopts "f" opt; do
+  case $opt in
+    f)
+      FORCE_REBUILD=true
+      ;;
+  esac
+done
+
+# Check if the Docker image already exists
+if [[ $(sudo docker images -q sandbox) && $FORCE_REBUILD == false ]]; then
+  echo "Docker image 'sandbox' already exists. Skipping build."
+else
+  # Create a Dockerfile for the container
+  touch Dockerfile
+  cat <<EOL > Dockerfile
 FROM ubuntu:latest
 RUN apt-get update && apt-get install -y g++ cmake libgtest-dev && \
     cd /usr/src/gtest && \
@@ -21,21 +35,25 @@ RUN apt-get update && apt-get install -y g++ cmake libgtest-dev && \
 CMD ["/bin/bash"]
 EOL
 
-# Build the Docker image
-sudo docker build -t sandbox .
+  # Build the Docker image
+  sudo docker build -t sandbox .
 
-# Run the Docker container
-sudo docker run -d --name sandbox -p 8080:80 sandbox
-
-# Ensure Docker permissions are correct
-if ! groups | grep -q '\bdocker\b'; then
-  echo "You need to log out and log back in for Docker group changes to take effect."
+  # Clean up the Dockerfile
+  rm Dockerfile
 fi
+
+# Prompt the user for database credentials
+read -p "Enter the database host: " DB_HOST
+read -p "Enter the database login: " DB_LOGIN
+read -s -p "Enter the database password: " DB_PASSWORD
+
+# Add a newline after password input for better formatting
+echo
 
 # Add MySQL database creation script
 cat <<EOL > create_database.sql
-CREATE DATABASE IF NOT EXISTS code_testing;
-USE code_testing;
+CREATE DATABASE IF NOT EXISTS languid;
+USE languid;
 
 CREATE TABLE IF NOT EXISTS exercise (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -61,10 +79,20 @@ CREATE TABLE IF NOT EXISTS user_exercise (
 EOL
 
 # Execute the SQL script to create the database and tables
-sudo mysql < create_database.sql
+mysql -h "$DB_HOST" -u "$DB_LOGIN" -p"$DB_PASSWORD" < create_database.sql
 
 # Clean up the SQL script
 rm create_database.sql
 
-rm Dockerfile
-# End of script
+# Add a default user to the user table
+cat <<EOL > insert_default_user.sql
+USE languid;
+
+INSERT INTO user (email, passwdHash) VALUES ('test', MD5('1234'));
+EOL
+
+# Execute the SQL script to insert the default user
+mysql -h "$DB_HOST" -u "$DB_LOGIN" -p"$DB_PASSWORD" < insert_default_user.sql
+
+# Clean up the SQL script
+rm insert_default_user.sql

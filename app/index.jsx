@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { View, TextInput, Button, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
-
+import { AuthContext } from '@/contexts/AuthContext';
 import { createStyles } from '@/css/login_css';
 import { useRouter } from 'expo-router';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -11,22 +11,31 @@ export default function LoginScreen()
   const router = useRouter();
   const styles = createStyles();
 
+  const { login, userToken } = useContext(AuthContext);
+
   const [username, setUser] = useState('');
   const [password, setPass] = useState('');
   const [hidden, setHidden] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   async function checkLogin()
   {
     setLoading(true);
+    setError(null);
 
-    // Erase when implemented
-    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-    await delay(500); // 2-second delay
-
-    if (username === "" && password === "")
+    try
     {
-      router.push('/Editor');
+      await login(username, password);
+      if (userToken)
+      {
+        router.push('/Editor');
+      }
+    } catch (err)
+    {
+      setError('Invalid login credentials');
+    } finally
+    {
       setLoading(false);
     }
   }
@@ -56,14 +65,15 @@ export default function LoginScreen()
           </TouchableOpacity>
         </View>
 
+        {error && <Text style={styles.error}>{error}</Text>}
 
-        {
-          loading ?
-            (<ActivityIndicator></ActivityIndicator>) :
-            (<Button title="Entrar" onPress={checkLogin} />)
-        }
+        {loading ? (
+          <ActivityIndicator />
+        ) : (
+          <Button title="Entrar" onPress={checkLogin} />
+        )}
       </View>
-    </ View >
+    </View>
   );
 }
 

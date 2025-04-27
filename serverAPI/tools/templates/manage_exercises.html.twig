@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Exercises</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Manage Exercises</h1>
+    <form method="POST" enctype="multipart/form-data" action="manage_exercises.php">
+        <h2>Add Exercise</h2>
+        <input type="text" name="name" placeholder="Exercise Name" required>
+        <textarea name="description" placeholder="Description" required></textarea>
+        <label for="cpp_file">Upload C++ File:</label>
+        <input type="file" name="cpp_file" accept=".cpp">
+        <button type="submit" name="action" value="add">Add</button>
+    </form>
+
+    <h2>Existing Exercises</h2>
+    <ul>
+        {% for exercise in exercises %}
+            <li>
+                <form method="POST" enctype="multipart/form-data" action="manage_exercises.php">
+                    <input type="hidden" name="id" value="{{ exercise.id }}">
+                    <input type="text" name="name" value="{{ exercise.name }}" required>
+                    <textarea name="description" required>{{ exercise.description }}</textarea>
+                    <label for="cpp_file">Upload C++ File:</label>
+                    <input type="file" name="cpp_file" accept=".cpp">
+                    <button type="submit" name="action" value="edit">Edit</button>
+                    <button type="submit" name="action" value="delete">Remove</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

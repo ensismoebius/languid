@@ -1,38 +1,27 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+# Ignore database scripts
+create_database.sql
+insert_default_user.sql
 
-# dependencies
+# Ignore Dockerfile created during setup
+Dockerfile
+
+# Ignore node_modules and build artifacts
 node_modules/
-
-# Expo
-.expo/
 dist/
-web-build/
-expo-env.d.ts
 
-# Native
-*.orig.*
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
+# Ignore environment files
+.env
 
-# Metro
-.metro-health-check*
+# Ignore logs
+*.log
 
-# debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
+# Ignore compiled PHP files
+*.php~
 
-# macOS
-.DS_Store
-*.pem
+# Ignore uploads and results
+uploads/
+serverAPI/results/
 
-# local env files
-.env*.local
-
-# typescript
-*.tsbuildinfo
-
-app-example
+# Ignore composer generated files
+serverAPI/tools/composer.lock
+serverAPI/tools/vendor/

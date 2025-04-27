@@ -1,5 +1,6 @@
 <?php
 require_once('CodeTester.php');
+require_once('AuthHandler.php'); // Include the new AuthHandler class
 
 class APIExercisesHandler
 {
@@ -55,6 +56,11 @@ class APIExercisesHandler
             exit;
         }
 
+        if (isset($input['username']) && isset($input['password'])) {
+            $this->handleLogin($input['username'], $input['password']);
+            return;
+        }
+
         $code = $input["code"] ?? "";
         $exercise = $input["exercise"] ?? "-1";
 
@@ -67,6 +73,20 @@ class APIExercisesHandler
             "status" => "success"
         ];
         echo json_encode($response);
+        exit;
+    }
+
+    private function handleLogin($username, $password)
+    {
+        $authHandler = new AuthHandler();
+        $token = $authHandler->authenticate($username, $password);
+
+        if ($token) {
+            echo json_encode(["status" => "success", "token" => $token]);
+        } else {
+            http_response_code(401);
+            echo json_encode(["status" => "error", "message" => "Invalid credentials"]);
+        }
         exit;
     }
 }
