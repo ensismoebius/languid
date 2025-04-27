@@ -6,8 +6,8 @@ import
     Text,
     FlatList,
     ScrollView,
-    TextInput,
     Keyboard,
+    TextInput,
     ActivityIndicator
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -15,6 +15,7 @@ import { createStyles } from '../css/editor_css';
 import Header from '../components/Header';
 import Console from '../components/Console';
 import CodeEditor from '../components/CodeEditor';
+import ExerciseInstructions from '../components/ExerciseInstructions';
 
 const API_URL = "http://192.168.0.5/languid/serverAPI/api.php";
 // Consider using environment variables for sensitive data
@@ -103,6 +104,9 @@ export default function Editor()
                 executing={executing}
                 exercises={exercises}
                 currentExercise={currentExercise}
+                setCurrentExercise={setCurrentExercise}
+                setCode={setCode}
+                setShowConsole={setShowConsole}
             />
 
             <CodeEditor
@@ -119,14 +123,9 @@ export default function Editor()
                 showConsole={showConsole}
             />
 
-            <TextInput
-                style={styles.instructions}
-                multiline
-                value={exercises[currentExercise].instruction}
-                editable={false}
-                autoCapitalize="none"
-                autoCorrect={false}
-                spellCheck={false}
+            <ExerciseInstructions
+                styles={styles}
+                instruction={exercises[currentExercise].instruction}
             />
         </LinearGradient>
     );

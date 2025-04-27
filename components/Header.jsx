@@ -1,14 +1,14 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+
+import { View, Text, Keyboard } from 'react-native';
 import ExecutingButton from './ExecutingButton';
 import ExercisesList from './ExercisesList';
 
-export default function Header({ styles, headerHeight, handleRunCode, executing, exercises, currentExercise })
+export default function Header({ styles, headerHeight, handleRunCode, executing, exercises, setCurrentExercise, currentExercise, setShowConsole })
 {
     const handleExerciseSelect = (index) =>
     {
         setCurrentExercise(index);
-        setCode('// Digite seu código abaixo');
         setShowConsole(false);
         Keyboard.dismiss();
     };
