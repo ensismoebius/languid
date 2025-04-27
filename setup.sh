@@ -18,8 +18,6 @@ RUN apt-get update && apt-get install -y g++ cmake libgtest-dev && \
     make && \
     mkdir -p /usr/lib/gtest && \
     cp lib/*.a /usr/lib/gtest
-COPY . /app
-WORKDIR /app
 CMD ["/bin/bash"]
 EOL
 

@@ -26,15 +26,6 @@ class CodeTester
 
         $testFile = EXERCISE_DIR . "{$this->exercise}_test.cpp";
         $execPath = BIN_DIR . $tempExecutableName;
-        // $cmd = "g++ -std=c++20 -I/usr/include/gtest $uploadPath $testFile -lgtest -lgtest_main -lpthread -o $execPath 2>&1";
-
-        // $compileOutput = shell_exec($cmd);
-
-        // if (!file_exists($execPath)) {
-        //     shell_exec("rm $uploadPath");
-        //     shell_exec("rm $execPath");
-        //     return $compileOutput;
-        // }
 
         // Check if the sandbox image exists
         $checkImageCmd = "docker images -q sandbox";
@@ -45,7 +36,8 @@ class CodeTester
         }
 
         $containerName = "sandbox" . uniqid();
-        $dockerCmd = "docker run --rm --name $containerName -v $uploadPath:/tmp/code.cpp:ro -v $testFile:/tmp/test.cpp:ro sandbox bash -c 'g++ -std=c++20 /tmp/code.cpp /tmp/test.cpp -lgtest -lgtest_main -lpthread -o /tmp/sandbox_exec && /tmp/sandbox_exec > /tmp/test_results.txt 2>&1 && cat /tmp/test_results.txt'";
+
+        $dockerCmd = "docker run --rm --name $containerName -v $uploadPath:/tmp/code.cpp:ro -v $testFile:/tmp/test.cpp:ro sandbox bash -c 'g++ -std=c++20 /tmp/code.cpp /tmp/test.cpp -lgtest -lgtest_main -lpthread -o /tmp/sandbox_exec && /tmp/sandbox_exec --gtest_output=json:res.json > /dev/null 2>&1 && cat res.json'";
 
         $testOutput = shell_exec($dockerCmd);
 
