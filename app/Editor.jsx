@@ -22,11 +22,6 @@ const API_URL = "http://192.168.0.5/languid/serverAPI/api.php";
 // const API_KEY = process.env.API_KEY || "re98wr6ew8r6rew76r89e6rwer6w98r6ywe9r6r6w87e9wr6ew06r7";
 const API_KEY = "re98wr6ew8r6rew76r89e6rwer6w98r6ywe9r6r6w87e9wr6ew06r7";
 
-const exercises = [
-    { id: 1, title: 'Exe 01', instruction: 'Crie a função principal e a faça retornar 0', done: false },
-    { id: 2, title: 'Exe 02', instruction: 'Implemente uma função que soma dois números', done: false },
-];
-
 export default function Editor()
 {
     const headerHeight = 80;
@@ -39,6 +34,14 @@ export default function Editor()
     const [showConsole, setShowConsole] = useState(false);
     const [executing, setExecuting] = useState(false);
     const [consoleOutput, setConsoleOutput] = useState('');
+
+    const [exercises, setExercises] = useState([
+        { id: 1, title: 'Exe 01', instruction: 'Crie a função principal e a faça retornar 0', done: false },
+        { id: 2, title: 'Exe 02', instruction: 'Implemente uma função que soma dois números', done: false },
+        { id: 3, title: 'Exe 03', instruction: 'Implemente uma função que soma dois números', done: false },
+        { id: 4, title: 'Exe 04', instruction: 'Implemente uma função que soma dois números', done: false },
+        { id: 5, title: 'Exe 05', instruction: 'Implemente uma função que soma dois números', done: false },
+    ]);
 
     const handleRunCode = async () =>
     {
@@ -76,6 +79,29 @@ export default function Editor()
             } else
             {
                 setConsoleOutput(jsonData.message);
+
+                const testsData = JSON.parse(jsonData.message);
+
+                // Check for failures and update the exercise status
+                const failures = parseInt(testsData.failures || "0");
+
+                if (failures == 0)
+                {
+                    setExercises(prevExercises =>
+                    {
+                        const updatedExercises = [...prevExercises];
+                        updatedExercises[currentExercise].done = true;
+                        return updatedExercises;
+                    });
+                } else
+                {
+                    setExercises(prevExercises =>
+                    {
+                        const updatedExercises = [...prevExercises];
+                        updatedExercises[currentExercise].done = false;
+                        return updatedExercises;
+                    });
+                }
             }
         } catch (error)
         {

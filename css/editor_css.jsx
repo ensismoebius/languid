@@ -40,8 +40,8 @@ export function createStyles(headerHeight)
             fontWeight: 'bold',
         },
         exerciseItem: {
-            padding: 10,
-            marginLeft: 10,
+            padding: 5,
+            marginLeft: 1,
             backgroundColor: '#eee',
             borderRadius: 5,
             alignItems: 'center',
@@ -65,7 +65,8 @@ export function createStyles(headerHeight)
             marginLeft: 10,
         },
         flatListContent: {
-            paddingRight: 15,
+            flex: 1,
+            paddingRight: 1,
             flexDirection: 'row',
             justifyContent: 'flex-start',
             alignItems: 'center',
@@ -74,7 +75,6 @@ export function createStyles(headerHeight)
             marginBottom: 3,
             marginRight: 3,
             borderRadius: 5,
-            padding: 5,
             width: '50%',
             maxHeight: 50,
         },
