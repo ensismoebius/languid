@@ -173,32 +173,32 @@ export default function Editor()
                     onKeyPress={handleKeyPress}
                     selection={selection}
                 />
-
-                {showConsole && (
-                    <View style={styles.consoleContainer}>
-                        <View style={styles.consoleHeader}>
-                            <Text style={styles.consoleTitle}>Console Output</Text>
-                        </View>
-                        <ScrollView
-                            ref={consoleScrollViewRef}
-                            style={styles.consoleOutput}
-                            contentContainerStyle={styles.consoleContent}
-                        >
-                            <Text style={styles.consoleText}>{consoleOutput}</Text>
-                        </ScrollView>
-                    </View>
-                )}
-
-                <TextInput
-                    style={styles.instructions}
-                    multiline
-                    value={exercises[currentExercise].instruction}
-                    editable={false}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    spellCheck={false}
-                />
             </ScrollView>
+
+            {showConsole && (
+                <View style={styles.consoleContainer}>
+                    <View style={styles.consoleHeader}>
+                        <Text style={styles.consoleTitle}>Console Output</Text>
+                    </View>
+                    <ScrollView
+                        ref={consoleScrollViewRef}
+                        style={styles.consoleOutput}
+                        contentContainerStyle={styles.consoleContent}
+                    >
+                        <Text style={styles.consoleText}>{consoleOutput}</Text>
+                    </ScrollView>
+                </View>
+            )}
+
+            <TextInput
+                style={styles.instructions}
+                multiline
+                value={exercises[currentExercise].instruction}
+                editable={false}
+                autoCapitalize="none"
+                autoCorrect={false}
+                spellCheck={false}
+            />
         </LinearGradient>
     );
 }

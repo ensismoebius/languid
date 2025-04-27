@@ -89,7 +89,7 @@ export function createStyles(headerHeight)
             color: 'white',
             fontFamily: Platform.select({ ios: 'Courier', android: 'monospace' }),
             padding: 15,
-            minHeight: Dimensions.get('window').height * 0.7 - 100,
+            minHeight: Dimensions.get('window').height * 0.5 - 100,
             textAlignVertical: 'top',
             backgroundColor: '#1e1e1e',
             borderRadius: 10,
