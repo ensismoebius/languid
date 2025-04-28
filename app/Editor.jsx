@@ -16,11 +16,7 @@ import Header from '../components/Header';
 import Console from '../components/Console';
 import CodeEditor from '../components/CodeEditor';
 import ExerciseInstructions from '../components/ExerciseInstructions';
-
-const API_URL = "http://192.168.0.5/languid/serverAPI/APIExercisesHandler.php";
-// Consider using environment variables for sensitive data
-// const API_KEY = process.env.API_KEY || "re98wr6ew8r6rew76r89e6rwer6w98r6ywe9r6r6w87e9wr6ew06r7";
-const API_KEY = "re98wr6ew8r6rew76r89e6rwer6w98r6ywe9r6r6w87e9wr6ew06r7";
+import { API_URL, API_KEY } from '../constants/API_constants';
 
 export default function Editor()
 {

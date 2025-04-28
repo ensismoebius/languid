@@ -64,15 +64,21 @@ class APIExercisesHandler
         $input = json_decode(file_get_contents("php://input"), true);
 
         if (!$input) {
-            echo json_encode(["status" => "error", "message" => "Invalid JSON data"]);
+            echo json_encode(
+                [
+                    "status" => "error",
+                    "message" => "Invalid JSON data"
+                ]
+            );
             exit;
         }
 
         $input = $this->sanitizeInput($input);
 
         if (isset($input['username']) && isset($input['password'])) {
-            $this->handleLogin($input['username'], $input['password']);
-            return;
+            $result = $this->handleLogin($input['username'], $input['password']);
+            echo json_encode($result);
+            exit;
         }
 
         $code = $input["code"] ?? "";
@@ -86,6 +92,7 @@ class APIExercisesHandler
             "message" => $testResult,
             "status" => "success"
         ];
+
         echo json_encode($response);
         exit;
     }
@@ -96,12 +103,21 @@ class APIExercisesHandler
         $token = $authHandler->authenticate($username, $password);
 
         if ($token) {
-            echo json_encode(["status" => "success", "token" => $token]);
+            return json_encode(
+                [
+                    "status" => "success",
+                    "token" => $token
+                ]
+            );
         } else {
             http_response_code(401);
-            echo json_encode(["status" => "error", "message" => "Invalid credentials"]);
+            return json_encode(
+                [
+                    "status" => "error",
+                    "message" => "Invalid credentials"
+                ]
+            );
         }
-        exit;
     }
 }
 

@@ -1,5 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import * as Keychain from 'react-native-keychain';
+import { API_URL, API_KEY } from '../constants/API_constants';
+import md5 from 'md5';
 
 export const AuthContext = createContext();
 
@@ -10,10 +12,40 @@ export const AuthProvider = ({ children }) =>
 
     const login = async (username, password) =>
     {
-        // Call your backend login API here
-        const token = 'example-token-from-api';
-        await Keychain.setGenericPassword('user', token);
-        setUserToken(token);
+        try
+        {
+            const hashedPassword = md5(password);
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-API-KEY": API_KEY,
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: hashedPassword
+                }),
+            });
+
+            if (!response.ok)
+            {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const jsonData = await response.json();
+
+            if (jsonData.token)
+            {
+                await Keychain.setGenericPassword('user', jsonData.token);
+                setUserToken(jsonData.token);
+            }
+        } catch (error)
+        {
+            console.error('Error during login:', error);
+        } finally
+        {
+            setIsLoading(false);
+        }
     };
 
     const logout = async () =>

@@ -13,28 +13,24 @@ class AuthHandler
         }
     }
 
-    public function authenticate($username, $password)
+    public function authenticate($username, $passwdHash)
     {
-        $stmt = $this->db->prepare("SELECT passwdHash FROM user WHERE email = ?");
-        $stmt->bind_param("s", $username);
+        $stmt = $this->db->prepare("SELECT id FROM user WHERE email = ? and passwdHash = ?");
+        $stmt->bind_param("ss", $username, $passwdHash);
         $stmt->execute();
-        $stmt->bind_result($passwdHash);
+        $stmt->bind_result($id);
         $stmt->fetch();
         $stmt->close();
 
-        if (password_verify($password, $passwdHash)) {
-            return $this->generateToken($username);
-        }
-
-        return null;
+        return $this->generateToken($id);
     }
 
-    private function generateToken($username)
+    private function generateToken($id)
     {
         $payload = [
-            'sub' => $username,
+            'sub' => $id,
             'iat' => time(),
-            'exp' => time() + (60 * 60) // Token valid for 1 hour
+            'exp' => time() + (60 * 60 * 24 * 30) // Token valid for 1 hour
         ];
 
         $secretKey = 'your-secret-key';
