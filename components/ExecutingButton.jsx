@@ -8,6 +8,7 @@ export default function ExecutingButton({ styles, handleRunCode, executing })
             style={styles.button}
             onPress={handleRunCode}
             disabled={executing}
+            accessibilityLabel="Executar código"
         >
             {executing ? (
                 <ActivityIndicator size="small" color="#fff" />

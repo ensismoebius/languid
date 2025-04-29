@@ -12,6 +12,7 @@ export default function ExerciseInstructions({ styles, instruction })
             autoCapitalize="none"
             autoCorrect={false}
             spellCheck={false}
+            accessibilityLabel="Instruções do exercício"
         />
     );
 }

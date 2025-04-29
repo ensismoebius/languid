@@ -16,6 +16,7 @@ export default function ExercisesList({ styles, exercises, currentExercise, hand
                         currentExercise === index && styles.selectedExercise
                     ]}
                     onPress={() => handleExerciseSelect(index)}
+                    accessibilityLabel={`Selecionar exercício: ${item.title}`}
                 >
                     <View style={[styles.exerciseItemContent, { flexDirection: 'row', alignItems: 'center' }]}>
                         <Text style={styles.exerciseText}>{item.title}</Text>

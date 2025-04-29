@@ -36,6 +36,7 @@ export default function CodeEditor({ styles, code, setCode, selection, setSelect
                 onSelectionChange={({ nativeEvent }) => setSelection(nativeEvent.selection)}
                 onKeyPress={handleKeyPress}
                 selection={selection}
+                accessibilityLabel="Editor de código"
             />
         </ScrollView>
     );

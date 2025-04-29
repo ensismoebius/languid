@@ -65,6 +65,7 @@ export default function LoginScreen()
           <TouchableOpacity
             onPress={() => setHidden(!hidden)}
             style={styles.passIcon}
+            accessibilityLabel={hidden ? "Mostrar senha" : "Ocultar senha"}
           >
             <Icon name={hidden ? "eye-off" : "eye"} size={20} />
           </TouchableOpacity>
