@@ -2,14 +2,14 @@
 #include <fstream>
 #include <cstdlib>
 
-TEST(SomaDoisNumerosTest, OutputTest)
+TEST(SomaVetorTest, OutputTest)
 {
-    system("g++ -o aluno_soma aluno_soma.cpp");
-    system("echo '3 4' | ./aluno_soma > saida.txt");
+    system("g++ -o aluno_somavetor aluno_somavetor.cpp");
+    system("echo '1 2 3 4 5' | ./aluno_somavetor > saida.txt");
     std::ifstream saida("saida.txt");
     std::string linha;
     std::getline(saida, linha);
-    EXPECT_EQ(linha, "Soma: 7");
+    EXPECT_EQ(linha, "Soma: 15");
 }
 
 int main(int argc, char **argv)

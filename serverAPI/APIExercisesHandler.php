@@ -1,6 +1,7 @@
 <?php
-require_once('CodeTester.php');
-require_once('AuthHandler.php'); // Include the new AuthHandler class
+require_once 'CodeTester.php';
+require_once 'AuthHandler.php';
+require_once 'isolate_config.php';
 
 class APIExercisesHandler
 {
@@ -22,6 +23,9 @@ class APIExercisesHandler
         }
 
         switch ($_SERVER['REQUEST_METHOD']) {
+            case 'GET':
+                $this->handleGetRequest();
+                break;
             case 'POST':
                 $this->handlePostRequest();
                 break;
@@ -94,6 +98,34 @@ class APIExercisesHandler
         ];
 
         echo json_encode($response);
+        exit;
+    }
+
+    private function handleGetRequest()
+    {
+        // Update with your DB credentials
+        $servername = "localhost";
+        $username = "root";
+        $password = "";
+        $dbname = "languid";
+
+        $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        if ($conn->connect_error) {
+            http_response_code(500);
+            echo json_encode(["status" => "error", "message" => "Database connection failed: " . $conn->connect_error]);
+            exit;
+        }
+
+        $sql = "SELECT id, title, instructions, testFileName FROM exercise";
+        $result = $conn->query($sql);
+        $exercises = [];
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $exercises[] = $row;
+            }
+        }
+        $conn->close();
+        echo json_encode(["status" => "success", "exercises" => $exercises]);
         exit;
     }
 

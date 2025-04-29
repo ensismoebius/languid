@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import
 {
     View,
@@ -31,13 +31,7 @@ export default function Editor()
     const [executing, setExecuting] = useState(false);
     const [consoleOutput, setConsoleOutput] = useState('');
 
-    const [exercises, setExercises] = useState([
-        { id: 1, title: 'Exe 01', instruction: 'Crie a função principal e a faça retornar 0', done: false },
-        { id: 2, title: 'Exe 02', instruction: 'Implemente uma função que soma dois números', done: false },
-        { id: 3, title: 'Exe 03', instruction: 'Implemente uma função que soma dois números', done: false },
-        { id: 4, title: 'Exe 04', instruction: 'Implemente uma função que soma dois números', done: false },
-        { id: 5, title: 'Exe 05', instruction: 'Implemente uma função que soma dois números', done: false },
-    ]);
+    const [exercises, setExercises] = useState([]);
 
     const handleRunCode = async () =>
     {
@@ -112,6 +106,44 @@ export default function Editor()
         }
     };
 
+    useEffect(() =>
+    {
+        const fetchExercises = async () =>
+        {
+            try
+            {
+                const response = await fetch(API_URL, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-KEY': API_KEY,
+                    },
+                });
+                if (!response.ok)
+                {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const jsonData = await response.json();
+                if (jsonData.status === 'success' && Array.isArray(jsonData.exercises))
+                {
+                    setExercises(jsonData.exercises.map(ex => ({
+                        id: ex.id,
+                        title: ex.title,
+                        instruction: ex.instructions || ex.instruction || '',
+                        done: false
+                    })));
+                } else
+                {
+                    setExercises([]);
+                }
+            } catch (error)
+            {
+                setExercises([]);
+            }
+        };
+        fetchExercises();
+    }, []);
+
     return (
         <LinearGradient
             colors={['#FF6B6B', '#FF8E53', '#FFAF40']}
@@ -147,7 +179,7 @@ export default function Editor()
 
             <ExerciseInstructions
                 styles={styles}
-                instruction={exercises[currentExercise].instruction}
+                instruction={exercises.length > 0 && exercises[currentExercise] ? exercises[currentExercise].instruction : ''}
             />
         </LinearGradient>
     );

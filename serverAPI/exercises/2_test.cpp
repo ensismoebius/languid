@@ -2,14 +2,14 @@
 #include <fstream>
 #include <cstdlib>
 
-TEST(SomaDoisNumerosTest, OutputTest)
+TEST(MultiplicacaoSimplesTest, OutputTest)
 {
-    system("g++ -o aluno_soma aluno_soma.cpp");
-    system("echo '3 4' | ./aluno_soma > saida.txt");
+    system("g++ -o aluno_mult aluno_mult.cpp");
+    system("echo '5 6' | ./aluno_mult > saida.txt");
     std::ifstream saida("saida.txt");
     std::string linha;
     std::getline(saida, linha);
-    EXPECT_EQ(linha, "Soma: 7");
+    EXPECT_EQ(linha, "Produto: 30");
 }
 
 int main(int argc, char **argv)
