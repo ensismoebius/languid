@@ -2,13 +2,13 @@
 #include <fstream>
 #include <cstdlib>
 
-TEST(SomaDoisNumerosTest, OutputTest)
+TEST(MultiplicacaoSimplesTest, OutputTest)
 {
-    system("echo '3 4' | /tmp/code_exec > saida.txt");
+    system("echo '5 6' | /tmp/code_exec > saida.txt");
     std::ifstream saida("saida.txt");
     std::string linha;
     std::getline(saida, linha);
-    EXPECT_EQ(linha, "Soma: 7");
+    EXPECT_EQ(linha, "Produto: 30");
 }
 
 int main(int argc, char **argv)

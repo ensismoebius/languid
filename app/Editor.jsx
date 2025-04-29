@@ -1,4 +1,3 @@
-//TODO: The file name is not being readed from table exercise
 import React, { useState, useRef, useEffect } from 'react';
 import
 {
@@ -53,7 +52,7 @@ export default function Editor()
                 },
                 body: JSON.stringify({
                     code: code,
-                    exercise: exercises[currentExercise].id
+                    exercise: exercises[currentExercise].testFileName
                 }),
             });
 
@@ -133,7 +132,8 @@ export default function Editor()
                         id: ex.id,
                         title: ex.title,
                         instruction: ex.instructions || ex.instruction || '',
-                        done: false
+                        done: false,
+                        testFileName: ex.testFileName || '',
                     })));
                 } else
                 {

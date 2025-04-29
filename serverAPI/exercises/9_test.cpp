@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
 
-TEST(FuncaoFatorialTest, FatorialCorreto)
+TEST(TrocaValoresTest, TrocaCorreta)
 {
-    extern int fatorial(int);
-    EXPECT_EQ(fatorial(5), 120);
+    extern void troca(int &a, int &b);
+    int a = 3, b = 5;
+    troca(a, b);
+    EXPECT_EQ(a, 5);
+    EXPECT_EQ(b, 3);
 }

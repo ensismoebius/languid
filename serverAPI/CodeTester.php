@@ -9,7 +9,7 @@ class CodeTester
     public function setCodeAndExercise($code, $exercise)
     {
         $this->code = $code;
-        $this->exercise = preg_replace('/[^a-zA-Z0-9_]/', '', $exercise);
+        $this->exercise = $exercise;
     }
 
     public function runTests()
@@ -24,7 +24,7 @@ class CodeTester
         $uploadPath = UPLOADS_DIR . $tempCppFileName;
         file_put_contents($uploadPath, $this->code);
 
-        $testFile = EXERCISE_DIR . "{$this->exercise}_test.cpp";
+        $testFile = EXERCISE_DIR . $this->exercise;
         $execPath = BIN_DIR . $tempExecutableName;
 
         // Check if the sandbox image exists

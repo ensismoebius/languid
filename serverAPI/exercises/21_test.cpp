@@ -1,25 +1,18 @@
 #include <gtest/gtest.h>
-#include <sstream>
-#include <iostream>
 
-class Pessoa
+class Retangulo
 {
 public:
-    std::string nome;
-    int idade;
-    void imprimir() const
-    {
-        std::cout << "Nome: " << nome << ", Idade: " << idade << std::endl;
-    }
+    int base, altura;
+    int area() const { return base * altura; }
+    int perimetro() const { return 2 * (base + altura); }
 };
 
-TEST(PessoaTest, ImprimeCorretamente)
+TEST(RetanguloTest, AreaEPerimetro)
 {
-    testing::internal::CaptureStdout();
-    Pessoa p;
-    p.nome = "Ana";
-    p.idade = 20;
-    p.imprimir();
-    std::string saida = testing::internal::GetCapturedStdout();
-    EXPECT_EQ(saida, "Nome: Ana, Idade: 20\n");
+    Retangulo r;
+    r.base = 4;
+    r.altura = 5;
+    EXPECT_EQ(r.area(), 20);
+    EXPECT_EQ(r.perimetro(), 18);
 }

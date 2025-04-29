@@ -2,13 +2,13 @@
 #include <fstream>
 #include <cstdlib>
 
-TEST(MediaNumerosTest, OutputTest)
+TEST(HelloWorldTest, OutputTest)
 {
-    system("echo '2.0 4.0 6.0 8.0' | /tmp/code_exec > saida.txt");
+    system("/tmp/code_exec > saida.txt");
     std::ifstream saida("saida.txt");
     std::string linha;
     std::getline(saida, linha);
-    EXPECT_EQ(linha, "Média: 5.0");
+    EXPECT_EQ(linha, "Olá, Mundo!");
 }
 
 int main(int argc, char **argv)

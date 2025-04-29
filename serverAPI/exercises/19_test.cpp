@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
 
-TEST(FuncaoPotenciaTest, PotenciaCorreta)
+TEST(DobraPorReferenciaTest, ValorDobrado)
 {
-    extern int potencia(int base, int expoente);
-    EXPECT_EQ(potencia(2, 3), 8);
+    extern void dobrar(int &x);
+    int valor = 4;
+    dobrar(valor);
+    EXPECT_EQ(valor, 8);
 }

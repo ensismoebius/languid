@@ -1,18 +1,22 @@
 #include <gtest/gtest.h>
 
-class Retangulo
+class ContaBancaria
 {
 public:
-    int base, altura;
-    int area() const { return base * altura; }
-    int perimetro() const { return 2 * (base + altura); }
+    int saldo;
+    void depositar(int valor) { saldo += valor; }
+    void sacar(int valor)
+    {
+        if (saldo - valor >= 0)
+            saldo -= valor;
+    }
 };
 
-TEST(RetanguloTest, AreaEPerimetro)
+TEST(ContaBancariaTest, DepositoSaque)
 {
-    Retangulo r;
-    r.base = 4;
-    r.altura = 5;
-    EXPECT_EQ(r.area(), 20);
-    EXPECT_EQ(r.perimetro(), 18);
+    ContaBancaria c;
+    c.saldo = 100;
+    c.depositar(50);
+    c.sacar(30);
+    EXPECT_EQ(c.saldo, 120);
 }

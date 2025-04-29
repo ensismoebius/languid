@@ -1,28 +1,26 @@
 #include <gtest/gtest.h>
-#include <iomanip>
-#include <sstream>
-#include <iostream>
 
-class Data
+class Livro
 {
+    std::string titulo, autor;
+    int ano;
+
 public:
-    int dia, mes, ano;
-    void imprimir() const
+    void set(const std::string &t, const std::string &a, int y)
     {
-        std::cout << std::setw(2) << std::setfill('0') << dia << "/"
-                  << std::setw(2) << std::setfill('0') << mes << "/"
-                  << ano << std::endl;
+        titulo = t;
+        autor = a;
+        ano = y;
+    }
+    std::string get() const
+    {
+        return "Título: " + titulo + ", Autor: " + autor + ", Ano: " + std::to_string(ano);
     }
 };
 
-TEST(DataTest, ImprimeCorretamente)
+TEST(LivroTest, ExibeCorretamente)
 {
-    testing::internal::CaptureStdout();
-    Data d;
-    d.dia = 5;
-    d.mes = 4;
-    d.ano = 2025;
-    d.imprimir();
-    std::string saida = testing::internal::GetCapturedStdout();
-    EXPECT_EQ(saida, "05/04/2025\n");
+    Livro l;
+    l.set("Dom Casmurro", "Machado de Assis", 1899);
+    EXPECT_EQ(l.get(), "Título: Dom Casmurro, Autor: Machado de Assis, Ano: 1899");
 }

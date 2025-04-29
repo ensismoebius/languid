@@ -1,27 +1,28 @@
 #include <gtest/gtest.h>
+#include <iomanip>
+#include <sstream>
+#include <iostream>
 
-class Pilha
+class Data
 {
-    int dados[10];
-    int topo = -1;
-
 public:
-    void push(int v)
+    int dia, mes, ano;
+    void imprimir() const
     {
-        if (topo < 9)
-            dados[++topo] = v;
+        std::cout << std::setw(2) << std::setfill('0') << dia << "/"
+                  << std::setw(2) << std::setfill('0') << mes << "/"
+                  << ano << std::endl;
     }
-    int pop() { return (topo >= 0) ? dados[topo--] : -1; }
-    int top() const { return (topo >= 0) ? dados[topo] : -1; }
 };
 
-TEST(PilhaTest, OperacoesBasicas)
+TEST(DataTest, ImprimeCorretamente)
 {
-    Pilha p;
-    p.push(1);
-    p.push(2);
-    p.push(3);
-    EXPECT_EQ(p.top(), 3);
-    EXPECT_EQ(p.pop(), 3);
-    EXPECT_EQ(p.top(), 2);
+    testing::internal::CaptureStdout();
+    Data d;
+    d.dia = 5;
+    d.mes = 4;
+    d.ano = 2025;
+    d.imprimir();
+    std::string saida = testing::internal::GetCapturedStdout();
+    EXPECT_EQ(saida, "05/04/2025\n");
 }

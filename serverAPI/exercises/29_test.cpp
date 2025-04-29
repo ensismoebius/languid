@@ -1,25 +1,34 @@
 #include <gtest/gtest.h>
+#include <string>
 
-class ContaCorrente
+class Agenda
 {
-    int saldo, limite;
+    std::string nomes[10];
+    int qtd = 0;
 
 public:
-    ContaCorrente(int s, int l) : saldo(s), limite(l) {}
-    bool sacar(int valor)
+    void adicionar(const std::string &nome)
     {
-        if (saldo - valor < -limite)
-            return false;
-        saldo -= valor;
-        return true;
+        if (qtd < 10)
+            nomes[qtd++] = nome;
     }
-    int getSaldo() const { return saldo; }
+    std::string listar() const
+    {
+        std::string r;
+        for (int i = 0; i < qtd; ++i)
+        {
+            if (i > 0)
+                r += ", ";
+            r += nomes[i];
+        }
+        return r;
+    }
 };
 
-TEST(ContaCorrenteTest, SaqueComLimite)
+TEST(AgendaTest, AdicionaELista)
 {
-    ContaCorrente c(100, 50);
-    EXPECT_TRUE(c.sacar(120));
-    EXPECT_EQ(c.getSaldo(), -20);
-    EXPECT_FALSE(c.sacar(31)); // Não pode passar do limite
+    Agenda a;
+    a.adicionar("Ana");
+    a.adicionar("João");
+    EXPECT_EQ(a.listar(), "Ana, João");
 }

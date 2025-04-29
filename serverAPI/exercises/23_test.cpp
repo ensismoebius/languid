@@ -1,22 +1,19 @@
 #include <gtest/gtest.h>
 
-class ContaBancaria
+class Aluno
 {
 public:
-    int saldo;
-    void depositar(int valor) { saldo += valor; }
-    void sacar(int valor)
-    {
-        if (saldo - valor >= 0)
-            saldo -= valor;
-    }
+    std::string nome;
+    float nota;
+    bool aprovado() const { return nota >= 6.0; }
 };
 
-TEST(ContaBancariaTest, DepositoSaque)
+TEST(AlunoTest, Aprovacao)
 {
-    ContaBancaria c;
-    c.saldo = 100;
-    c.depositar(50);
-    c.sacar(30);
-    EXPECT_EQ(c.saldo, 120);
+    Aluno a;
+    a.nome = "João";
+    a.nota = 7.0;
+    EXPECT_TRUE(a.aprovado());
+    a.nota = 5.9;
+    EXPECT_FALSE(a.aprovado());
 }

@@ -1,9 +1,25 @@
 #include <gtest/gtest.h>
+#include <sstream>
+#include <iostream>
 
-TEST(DobraPorReferenciaTest, ValorDobrado)
+class Pessoa
 {
-    extern void dobrar(int &x);
-    int valor = 4;
-    dobrar(valor);
-    EXPECT_EQ(valor, 8);
+public:
+    std::string nome;
+    int idade;
+    void imprimir() const
+    {
+        std::cout << "Nome: " << nome << ", Idade: " << idade << std::endl;
+    }
+};
+
+TEST(PessoaTest, ImprimeCorretamente)
+{
+    testing::internal::CaptureStdout();
+    Pessoa p;
+    p.nome = "Ana";
+    p.idade = 20;
+    p.imprimir();
+    std::string saida = testing::internal::GetCapturedStdout();
+    EXPECT_EQ(saida, "Nome: Ana, Idade: 20\n");
 }

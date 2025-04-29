@@ -2,13 +2,13 @@
 #include <fstream>
 #include <cstdlib>
 
-TEST(ParOuImparTest, OutputTest)
+TEST(SomaVetorTest, OutputTest)
 {
-    system("echo '7' | /tmp/code_exec > saida.txt");
+    system("echo '1 2 3 4 5' | /tmp/code_exec > saida.txt");
     std::ifstream saida("saida.txt");
     std::string linha;
     std::getline(saida, linha);
-    EXPECT_EQ(linha, "Impar");
+    EXPECT_EQ(linha, "Soma: 15");
 }
 
 int main(int argc, char **argv)
