@@ -2,14 +2,13 @@
 #include <fstream>
 #include <cstdlib>
 
-TEST(ParOuImparTest, OutputTest)
+TEST(MaiorDeDoisNumerosTest, OutputTest)
 {
-    system("g++ -o aluno_parimpar aluno_parimpar.cpp");
-    system("echo '7' | ./aluno_parimpar > saida.txt");
+    system("echo '8 12' | ./code_exec > saida.txt");
     std::ifstream saida("saida.txt");
     std::string linha;
     std::getline(saida, linha);
-    EXPECT_EQ(linha, "Ímpar");
+    EXPECT_EQ(linha, "Maior: 12");
 }
 
 int main(int argc, char **argv)

@@ -1,23 +1,10 @@
 #include <gtest/gtest.h>
-#include <fstream>
-#include <cstdlib>
 
-TEST(BuscaVetorTest, Encontrado)
+TEST(TrocaValoresTest, TrocaCorreta)
 {
-    system("g++ -o aluno_busca aluno_busca.cpp");
-    system("echo '1 2 3 4 5 6 7 8 9 10\n7' | ./aluno_busca > saida.txt");
-    std::ifstream saida("saida.txt");
-    std::string linha;
-    while (std::getline(saida, linha))
-    {
-        if (linha == "Encontrado")
-            break;
-    }
-    EXPECT_EQ(linha, "Encontrado");
-}
-
-int main(int argc, char **argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    extern void troca(int &a, int &b);
+    int a = 3, b = 5;
+    troca(a, b);
+    EXPECT_EQ(a, 5);
+    EXPECT_EQ(b, 3);
 }

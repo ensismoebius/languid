@@ -2,14 +2,13 @@
 #include <fstream>
 #include <cstdlib>
 
-TEST(MaiorDeDoisNumerosTest, OutputTest)
+TEST(MultiplicacaoSimplesTest, OutputTest)
 {
-    system("g++ -o aluno_maior aluno_maior.cpp");
-    system("echo '8 12' | ./aluno_maior > saida.txt");
+    system("echo '5 6' | ./code_exec > saida.txt");
     std::ifstream saida("saida.txt");
     std::string linha;
     std::getline(saida, linha);
-    EXPECT_EQ(linha, "Maior: 12");
+    EXPECT_EQ(linha, "Produto: 30");
 }
 
 int main(int argc, char **argv)

@@ -106,12 +106,6 @@ class APIExercisesHandler
 
     private function handleGetRequest()
     {
-        // Update with your DB credentials
-        $servername = "localhost";
-        $username = "root";
-        $password = "";
-        $dbname = "languid";
-
         $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         if ($conn->connect_error) {
             http_response_code(500);

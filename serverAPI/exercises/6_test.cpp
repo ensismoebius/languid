@@ -2,14 +2,13 @@
 #include <fstream>
 #include <cstdlib>
 
-TEST(MediaNumerosTest, OutputTest)
+TEST(SomaVetorTest, OutputTest)
 {
-    system("g++ -o aluno_media aluno_media.cpp");
-    system("echo '2.0 4.0 6.0 8.0' | ./aluno_media > saida.txt");
+    system("echo '1 2 3 4 5' | ./code_exec > saida.txt");
     std::ifstream saida("saida.txt");
     std::string linha;
     std::getline(saida, linha);
-    EXPECT_EQ(linha, "Média: 5.0");
+    EXPECT_EQ(linha, "Soma: 15");
 }
 
 int main(int argc, char **argv)

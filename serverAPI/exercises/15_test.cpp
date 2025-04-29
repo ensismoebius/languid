@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-TEST(FibonacciRecursivoTest, ValorCorreto)
+TEST(ContadorVogaisTest, ContaCorreta)
 {
-    extern int fibonacci(int n);
-    EXPECT_EQ(fibonacci(6), 8);
+    extern int contarVogais(const char *s);
+    EXPECT_EQ(contarVogais("banana"), 3);
 }

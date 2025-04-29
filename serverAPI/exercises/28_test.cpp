@@ -1,25 +1,26 @@
 #include <gtest/gtest.h>
 
-class ContaCorrente
+class Livro
 {
-    int saldo, limite;
+    std::string titulo, autor;
+    int ano;
 
 public:
-    ContaCorrente(int s, int l) : saldo(s), limite(l) {}
-    bool sacar(int valor)
+    void set(const std::string &t, const std::string &a, int y)
     {
-        if (saldo - valor < -limite)
-            return false;
-        saldo -= valor;
-        return true;
+        titulo = t;
+        autor = a;
+        ano = y;
     }
-    int getSaldo() const { return saldo; }
+    std::string get() const
+    {
+        return "Título: " + titulo + ", Autor: " + autor + ", Ano: " + std::to_string(ano);
+    }
 };
 
-TEST(ContaCorrenteTest, SaqueComLimite)
+TEST(LivroTest, ExibeCorretamente)
 {
-    ContaCorrente c(100, 50);
-    EXPECT_TRUE(c.sacar(120));
-    EXPECT_EQ(c.getSaldo(), -20);
-    EXPECT_FALSE(c.sacar(31)); // Não pode passar do limite
+    Livro l;
+    l.set("Dom Casmurro", "Machado de Assis", 1899);
+    EXPECT_EQ(l.get(), "Título: Dom Casmurro, Autor: Machado de Assis, Ano: 1899");
 }

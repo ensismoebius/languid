@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-TEST(FuncaoFatorialTest, FatorialCorreto)
+TEST(FuncaoSomaTest, SomaCorreta)
 {
-    extern int fatorial(int);
-    EXPECT_EQ(fatorial(5), 120);
+    extern int soma(int, int);
+    EXPECT_EQ(soma(3, 4), 7);
 }

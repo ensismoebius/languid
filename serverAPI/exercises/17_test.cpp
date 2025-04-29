@@ -1,9 +1,20 @@
 #include <gtest/gtest.h>
+#include <fstream>
+#include <cstdlib>
 
-TEST(ProdutoEscalarTest, ValorCorreto)
+TEST(SomaMatrizTest, OutputTest)
 {
-    extern int produtoEscalar(const int *a, const int *b, int n);
-    int v1[3] = {1, 2, 3};
-    int v2[3] = {4, 5, 6};
-    EXPECT_EQ(produtoEscalar(v1, v2, 3), 32);
+    system("echo '1 2 3 4\n5 6 7 8' | ./code_exec > saida.txt");
+    std::ifstream saida("saida.txt");
+    std::string linha;
+    std::getline(saida, linha);
+    EXPECT_EQ(linha, "6 8");
+    std::getline(saida, linha);
+    EXPECT_EQ(linha, "10 12");
+}
+
+int main(int argc, char **argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

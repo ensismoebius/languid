@@ -2,18 +2,17 @@
 #include <fstream>
 #include <cstdlib>
 
-TEST(MediaPonderadaTest, OutputTest)
+TEST(BuscaVetorTest, Encontrado)
 {
-    system("g++ -o aluno_mediapond aluno_mediapond.cpp");
-    system("echo '7 8 9\n2 3 5' | ./aluno_mediapond > saida.txt");
+    system("echo '1 2 3 4 5 6 7 8 9 10\n7' | ./code_exec > saida.txt");
     std::ifstream saida("saida.txt");
     std::string linha;
     while (std::getline(saida, linha))
     {
-        if (linha.find("Média ponderada:") != std::string::npos)
+        if (linha == "Encontrado")
             break;
     }
-    EXPECT_EQ(linha, "Média ponderada: 8.3");
+    EXPECT_EQ(linha, "Encontrado");
 }
 
 int main(int argc, char **argv)

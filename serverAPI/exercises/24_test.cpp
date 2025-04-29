@@ -1,26 +1,19 @@
 #include <gtest/gtest.h>
 
-class Vetor
+class Aluno
 {
-    int *dados;
-    int tamanho;
-
 public:
-    Vetor(int n) : tamanho(n) { dados = new int[n]; }
-    ~Vetor() { delete[] dados; }
-    void set(int i, int v) { dados[i] = v; }
-    int get(int i) const { return dados[i]; }
-    int size() const { return tamanho; }
+    std::string nome;
+    float nota;
+    bool aprovado() const { return nota >= 6.0; }
 };
 
-TEST(VetorTest, VetorDinamico)
+TEST(AlunoTest, Aprovacao)
 {
-    Vetor v(3);
-    v.set(0, 1);
-    v.set(1, 2);
-    v.set(2, 3);
-    EXPECT_EQ(v.get(0), 1);
-    EXPECT_EQ(v.get(1), 2);
-    EXPECT_EQ(v.get(2), 3);
-    EXPECT_EQ(v.size(), 3);
+    Aluno a;
+    a.nome = "João";
+    a.nota = 7.0;
+    EXPECT_TRUE(a.aprovado());
+    a.nota = 5.9;
+    EXPECT_FALSE(a.aprovado());
 }

@@ -1,7 +1,22 @@
 #include <gtest/gtest.h>
+#include <fstream>
+#include <cstdlib>
 
-TEST(FuncaoMaximoTest, MaximoCorreto)
+TEST(MediaPonderadaTest, OutputTest)
 {
-    extern int maximo(int, int, int);
-    EXPECT_EQ(maximo(3, 7, 5), 7);
+    system("echo '7 8 9\n2 3 5' | ./code_exec > saida.txt");
+    std::ifstream saida("saida.txt");
+    std::string linha;
+    while (std::getline(saida, linha))
+    {
+        if (linha.find("Média ponderada:") != std::string::npos)
+            break;
+    }
+    EXPECT_EQ(linha, "Média ponderada: 8.3");
+}
+
+int main(int argc, char **argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
