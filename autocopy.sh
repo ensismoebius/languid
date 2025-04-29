@@ -6,4 +6,6 @@ do
     echo "Detected change in $file, copying to /var/www/languid/";
     mkdir -p "/var/www/languid/serverAPI/";
     cp "$file" "/var/www/languid/$file"; 
+    chmod 775 "/var/www/languid/$file";
+    chown ensismoebius:www-data "/var/www/languid/$file";
 done
