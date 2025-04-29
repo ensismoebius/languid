@@ -4,7 +4,7 @@
 
 TEST(MultiplicacaoSimplesTest, OutputTest)
 {
-    system("echo '5 6' | ./code_exec > saida.txt");
+    system("echo '5 6' | /tmp/code_exec > saida.txt");
     std::ifstream saida("saida.txt");
     std::string linha;
     std::getline(saida, linha);

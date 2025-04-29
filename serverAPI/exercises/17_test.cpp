@@ -4,7 +4,7 @@
 
 TEST(SomaMatrizTest, OutputTest)
 {
-    system("echo '1 2 3 4\n5 6 7 8' | ./code_exec > saida.txt");
+    system("echo '1 2 3 4\n5 6 7 8' | /tmp/code_exec > saida.txt");
     std::ifstream saida("saida.txt");
     std::string linha;
     std::getline(saida, linha);

@@ -4,7 +4,7 @@
 
 TEST(MaiorDeDoisNumerosTest, OutputTest)
 {
-    system("echo '8 12' | ./code_exec > saida.txt");
+    system("echo '8 12' | /tmp/code_exec > saida.txt");
     std::ifstream saida("saida.txt");
     std::string linha;
     std::getline(saida, linha);

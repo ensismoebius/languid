@@ -4,7 +4,7 @@
 
 TEST(BuscaVetorTest, Encontrado)
 {
-    system("echo '1 2 3 4 5 6 7 8 9 10\n7' | ./code_exec > saida.txt");
+    system("echo '1 2 3 4 5 6 7 8 9 10\n7' | /tmp/code_exec > saida.txt");
     std::ifstream saida("saida.txt");
     std::string linha;
     while (std::getline(saida, linha))

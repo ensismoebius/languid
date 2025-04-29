@@ -4,11 +4,11 @@
 
 TEST(HelloWorldTest, OutputTest)
 {
-    system("./code_exec > saida.txt");
+    system("/tmp/code_exec > saida.txt");
     std::ifstream saida("saida.txt");
     std::string linha;
     std::getline(saida, linha);
-    EXPECT_EQ(linha, "Olá, Mundo!\n");
+    EXPECT_EQ(linha, "Olá, Mundo!");
 }
 
 int main(int argc, char **argv)

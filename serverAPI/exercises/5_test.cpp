@@ -4,7 +4,7 @@
 
 TEST(ParOuImparTest, OutputTest)
 {
-    system("echo '7' | ./code_exec > saida.txt");
+    system("echo '7' | /tmp/code_exec > saida.txt");
     std::ifstream saida("saida.txt");
     std::string linha;
     std::getline(saida, linha);

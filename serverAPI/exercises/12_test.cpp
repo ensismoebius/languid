@@ -4,7 +4,7 @@
 
 TEST(MediaPonderadaTest, OutputTest)
 {
-    system("echo '7 8 9\n2 3 5' | ./code_exec > saida.txt");
+    system("echo '7 8 9\n2 3 5' | /tmp/code_exec > saida.txt");
     std::ifstream saida("saida.txt");
     std::string linha;
     while (std::getline(saida, linha))

@@ -4,7 +4,7 @@
 
 TEST(SomaDoisNumerosTest, OutputTest)
 {
-    system("echo '3 4' | ./code_exec > saida.txt");
+    system("echo '3 4' | /tmp/code_exec > saida.txt");
     std::ifstream saida("saida.txt");
     std::string linha;
     std::getline(saida, linha);
