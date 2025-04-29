@@ -6,6 +6,21 @@ import { Platform } from 'react-native';
 
 export const AuthContext = createContext();
 
+// Utilitário seguro para extrair propriedades de objetos JSON
+export function safeExtract(obj, propName)
+{
+    try
+    {
+        // Evita problemas com getters dinâmicos ou proxies ao copiar o valor
+        return JSON.parse(JSON.stringify({ value: obj[propName] })).value;
+    } catch (e)
+    {
+        console.warn(`Falha ao extrair propriedade segura "${propName}":`, e);
+        return undefined;
+    }
+}
+
+
 export const AuthProvider = ({ children }) =>
 {
     const [userToken, setUserToken] = useState('');
@@ -71,9 +86,10 @@ export const AuthProvider = ({ children }) =>
 
             if (jsonData.token)
             {
-                await setToken(jsonData.token);
-                setUserToken(jsonData.token);
+                await setToken(token);
+                setUserToken(token);
             }
+
         } catch (error)
         {
             console.error('Error during login:', error);

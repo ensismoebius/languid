@@ -18,6 +18,7 @@ import CodeEditor from '../components/CodeEditor';
 import ExerciseInstructions from '../components/ExerciseInstructions';
 import { API_URL, API_KEY } from '../constants/API_constants';
 import { AuthContext } from '../contexts/AuthContext';
+import { useRouter } from 'expo-router';
 
 export default function Editor()
 {
@@ -34,6 +35,7 @@ export default function Editor()
 
     const [exercises, setExercises] = useState([]);
     const { userToken } = useContext(AuthContext); // Get token from AuthContext
+    const router = useRouter();
 
     const handleRunCode = async () =>
     {
@@ -61,10 +63,16 @@ export default function Editor()
 
             if (!response.ok)
             {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                // Unauthorized access / Token expired
+                if (response.status === 401)
+                {
+                    router.replace('/'); // Redirect to index
+                    return;
+                }
             }
 
             const jsonData = await response.json();
+
 
             if (jsonData.status === 'error' || jsonData.status === 'fail')
             {
@@ -127,9 +135,15 @@ export default function Editor()
                 });
                 if (!response.ok)
                 {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    // Unauthorized access / Token expired
+                    if (response.status === 401)
+                    {
+                        router.replace('/'); // Redirect to index
+                        return;
+                    }
                 }
                 const jsonData = await response.json();
+
                 if (jsonData.status === 'success' && Array.isArray(jsonData.exercises))
                 {
                     setExercises(jsonData.exercises.map(ex => ({

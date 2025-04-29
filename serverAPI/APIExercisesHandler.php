@@ -111,7 +111,7 @@ class APIExercisesHandler
 
         if (isset($input['username']) && isset($input['password'])) {
             $result = $this->handleLogin($input['username'], $input['password']);
-            echo json_encode($result);
+            echo $result;
             exit;
         }
 
