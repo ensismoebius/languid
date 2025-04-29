@@ -1,13 +1,14 @@
 import React, { createContext, useState, useEffect } from 'react';
-import * as Keychain from 'react-native-keychain';
+import * as SecureStore from 'expo-secure-store';
 import { API_URL, API_KEY } from '../constants/API_constants';
 import md5 from 'md5';
+import { Platform } from 'react-native';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) =>
 {
-    const [userToken, setUserToken] = useState(null);
+    const [userToken, setUserToken] = useState('');
     const [isLoading, setIsLoading] = useState(true);
 
     const login = async (username, password) =>
@@ -36,12 +37,18 @@ export const AuthProvider = ({ children }) =>
 
             if (jsonData.token)
             {
-                await Keychain.setGenericPassword('user', jsonData.token);
+                if (Platform.OS !== 'web')
+                {
+                    await SecureStore.setItemAsync('userToken', jsonData.token);
+                } else
+                {
+                    localStorage.setItem('userToken', jsonData.token);
+                }
                 setUserToken(jsonData.token);
             }
         } catch (error)
         {
-            console.error('Error during login:', error);
+            console.error('Error during login:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
         } finally
         {
             setIsLoading(false);
@@ -50,7 +57,13 @@ export const AuthProvider = ({ children }) =>
 
     const logout = async () =>
     {
-        await Keychain.resetGenericPassword();
+        if (Platform.OS !== 'web')
+        {
+            await SecureStore.deleteItemAsync('userToken');
+        } else
+        {
+            localStorage.removeItem('userToken');
+        }
         setUserToken(null);
     };
 
@@ -58,8 +71,15 @@ export const AuthProvider = ({ children }) =>
     {
         try
         {
-            const creds = await Keychain.getGenericPassword();
-            if (creds) setUserToken(creds.password);
+            if (Platform.OS !== 'web')
+            {
+                const token = await SecureStore.getItemAsync('userToken');
+                if (token) setUserToken(token);
+            } else
+            {
+                const token = localStorage.getItem('userToken');
+                if (token) setUserToken(token);
+            }
         } catch (e)
         {
             console.log('No token found');

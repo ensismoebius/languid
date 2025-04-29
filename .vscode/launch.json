@@ -2,14 +2,20 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Program",
-      "type": "node",
+      "name": "Debug Expo (Web)",
+      "type": "pwa-chrome",
       "request": "launch",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "program": "${workspaceFolder}/app/index.ts",
-      "preLaunchTask": "npm: build"
+      "url": "http://localhost:8081",
+      "webRoot": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Debug Expo (Android)",
+      "type": "reactnative",
+      "request": "launch",
+      "platform": "android",
+      "sourceMaps": true,
+      "cwd": "${workspaceFolder}"
     }
   ]
 }

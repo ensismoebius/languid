@@ -100,6 +100,18 @@ class APIExercisesHandler
     private function handleLogin($username, $password)
     {
         $authHandler = new AuthHandler();
+        $connectionMessage = $authHandler->connect();
+
+        if ($connectionMessage !== "Connected successfully") {
+            http_response_code(500);
+            return json_encode(
+                [
+                    "status" => "error",
+                    "message" => $connectionMessage
+                ]
+            );
+        }
+
         $token = $authHandler->authenticate($username, $password);
 
         if ($token) {
@@ -124,4 +136,3 @@ class APIExercisesHandler
 // Instantiate and handle the request
 $apiExercisesHandler = new APIExercisesHandler();
 $apiExercisesHandler->handleRequest();
-
