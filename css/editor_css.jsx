@@ -108,6 +108,7 @@ export function createStyles(headerHeight)
             elevation: 5,
             fontSize: 16,
             lineHeight: 24,
+            minHeight: Dimensions.get('window').height * 0.5 - 100,
         },
         consoleContainer: {
             backgroundColor: '#1e1e1e',

@@ -41,10 +41,6 @@ class CodeTester
 
         $testOutput = shell_exec($dockerCmd);
 
-        if ($testOutput === null) {
-            $testOutput = "Error: Test execution failed. Check server logs for details.";
-        }
-
         // Cleanup
         shell_exec("rm $uploadPath");
         shell_exec("rm $execPath");

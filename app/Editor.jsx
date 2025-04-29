@@ -68,8 +68,6 @@ export default function Editor()
                 setConsoleOutput(`Error: ${jsonData.message}`);
             } else
             {
-                setConsoleOutput(jsonData.message);
-
                 const testsData = JSON.parse(jsonData.message);
 
                 // Check for failures and update the exercise status
@@ -77,6 +75,9 @@ export default function Editor()
 
                 if (failures == 0)
                 {
+                    setConsoleOutput("Execução feita com sucesso: Vá para o próximo exercício");
+
+                    // Update the exercise status to done
                     setExercises(prevExercises =>
                     {
                         const updatedExercises = [...prevExercises];
@@ -85,6 +86,7 @@ export default function Editor()
                     });
                 } else
                 {
+                    setConsoleOutput(`Falhas: ${failures} - Tente novamente`);
                     setExercises(prevExercises =>
                     {
                         const updatedExercises = [...prevExercises];

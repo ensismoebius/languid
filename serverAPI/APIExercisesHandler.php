@@ -55,6 +55,9 @@ class APIExercisesHandler
     {
         if (is_array($input)) {
             foreach ($input as $key => $value) {
+                if ($key === 'code') {
+                    continue; // Skip sanitizing the code field 
+                }
                 $input[$key] = $this->sanitizeInput($value);
             }
         } else {
@@ -93,8 +96,8 @@ class APIExercisesHandler
         $testResult = $tester->runTests();
 
         $response = [
-            "message" => $testResult,
-            "status" => "success"
+            "message" => $testResult ?? "No output",
+            "status" => is_null($testResult) ? "fail" : "success"
         ];
 
         echo json_encode($response);
