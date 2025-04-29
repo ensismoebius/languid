@@ -37,15 +37,35 @@ export default function Editor()
     const { userToken } = useContext(AuthContext); // Get token from AuthContext
     const router = useRouter();
 
+    // Helper to update exercise status
+    const updateExerciseStatus = (done) =>
+    {
+        setExercises(prev =>
+        {
+            const updated = [...prev];
+            if (updated[currentExercise]) updated[currentExercise].done = done;
+            return updated;
+        });
+    };
+
+    // Helper to handle unauthorized
+    const handleUnauthorized = (response) =>
+    {
+        if (response.status === 401)
+        {
+            router.replace('/');
+            return true;
+        }
+        return false;
+    };
+
     const handleRunCode = async () =>
     {
         if (executing) return;
-
         setExecuting(true);
         setShowConsole(true);
         setConsoleOutput("Executando...");
         Keyboard.dismiss();
-
         try
         {
             const response = await fetch(API_URL, {
@@ -56,55 +76,28 @@ export default function Editor()
                     ...(userToken ? { "Authorization": `Bearer ${userToken}` } : {}),
                 },
                 body: JSON.stringify({
-                    code: code,
-                    exercise: exercises[currentExercise].testFileName
+                    code,
+                    exercise: exercises[currentExercise]?.testFileName
                 }),
             });
-
-            if (!response.ok)
-            {
-                // Unauthorized access / Token expired
-                if (response.status === 401)
-                {
-                    router.replace('/'); // Redirect to index
-                    return;
-                }
-            }
-
+            if (!response.ok && handleUnauthorized(response)) return;
             const jsonData = await response.json();
-
-
-            if (jsonData.status === 'error' || jsonData.status === 'fail')
+            if (jsonData.status !== 'success')
             {
                 setConsoleOutput(`Error: ${jsonData.message}`);
+                updateExerciseStatus(false);
+                return;
+            }
+            const testsData = JSON.parse(jsonData.message);
+            const failures = parseInt(testsData.failures || "0");
+            if (failures === 0)
+            {
+                setConsoleOutput("Execução feita com sucesso: Vá para o próximo exercício");
+                updateExerciseStatus(true);
             } else
             {
-                const testsData = JSON.parse(jsonData.message);
-
-                // Check for failures and update the exercise status
-                const failures = parseInt(testsData.failures || "0");
-
-                if (failures == 0)
-                {
-                    setConsoleOutput("Execução feita com sucesso: Vá para o próximo exercício");
-
-                    // Update the exercise status to done
-                    setExercises(prevExercises =>
-                    {
-                        const updatedExercises = [...prevExercises];
-                        updatedExercises[currentExercise].done = true;
-                        return updatedExercises;
-                    });
-                } else
-                {
-                    setConsoleOutput(`Falhas: ${failures} - Tente novamente`);
-                    setExercises(prevExercises =>
-                    {
-                        const updatedExercises = [...prevExercises];
-                        updatedExercises[currentExercise].done = false;
-                        return updatedExercises;
-                    });
-                }
+                setConsoleOutput(`Falhas: ${failures} - Tente novamente`);
+                updateExerciseStatus(false);
             }
         } catch (error)
         {
@@ -133,17 +126,8 @@ export default function Editor()
                         ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {}),
                     },
                 });
-                if (!response.ok)
-                {
-                    // Unauthorized access / Token expired
-                    if (response.status === 401)
-                    {
-                        router.replace('/'); // Redirect to index
-                        return;
-                    }
-                }
+                if (!response.ok && handleUnauthorized(response)) return;
                 const jsonData = await response.json();
-
                 if (jsonData.status === 'success' && Array.isArray(jsonData.exercises))
                 {
                     setExercises(jsonData.exercises.map(ex => ({
@@ -157,7 +141,7 @@ export default function Editor()
                 {
                     setExercises([]);
                 }
-            } catch (error)
+            } catch
             {
                 setExercises([]);
             }
