@@ -66,6 +66,33 @@ class APIExercisesHandler
         return $input;
     }
 
+    private function getBearerToken()
+    {
+        $headers = getallheaders();
+        $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+        if (preg_match('/Bearer\s(.*)/', $authHeader, $matches)) {
+            return $matches[1];
+        }
+        return null;
+    }
+
+    private function requireValidToken()
+    {
+        $token = $this->getBearerToken();
+        if (!$token) {
+            http_response_code(401);
+            echo json_encode(["status" => "error", "message" => "Missing or invalid Authorization header"]);
+            exit;
+        }
+        $authHandler = new AuthHandler();
+        $authHandler->connect();
+        if (!$authHandler->verifyToken($token)) {
+            http_response_code(401);
+            echo json_encode(["status" => "expired", "message" => "Token expired or invalid"]);
+            exit;
+        }
+    }
+
     private function handlePostRequest()
     {
         $input = json_decode(file_get_contents("php://input"), true);
@@ -87,6 +114,9 @@ class APIExercisesHandler
             echo json_encode($result);
             exit;
         }
+
+        // Require valid token for all other POST requests
+        $this->requireValidToken();
 
         $code = $input["code"] ?? "";
         $exercise = $input["exercise"] ?? "-1";

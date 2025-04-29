@@ -4,6 +4,7 @@ require_once 'isolate_config.php';
 class AuthHandler
 {
     private $db;
+    private $secretKey = 'your-secret-key';
 
     public function connect()
     {
@@ -46,12 +47,39 @@ class AuthHandler
             'exp' => time() + (60 * 60 * 24 * 30) // Token valid for 1 hour
         ];
 
-        $secretKey = 'your-secret-key';
-        return $this->base64UrlEncode(json_encode($payload)) . '.' . $this->base64UrlEncode(hash_hmac('sha256', json_encode($payload), $secretKey, true));
+        return $this->base64UrlEncode(json_encode($payload)) . '.' . $this->base64UrlEncode(hash_hmac('sha256', json_encode($payload), $this->secretKey, true));
     }
 
     private function base64UrlEncode($data)
     {
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+    }
+
+    public function verifyToken($token)
+    {
+        $parts = explode('.', $token);
+        if (count($parts) !== 2) {
+            return false; // Invalid token format
+        }
+
+        list($encodedPayload, $encodedSignature) = $parts;
+
+        // Decode payload
+        $payloadJson = base64_decode(strtr($encodedPayload, '-_', '+/'));
+        $payload = json_decode($payloadJson, true);
+        if (!isset($payload['exp'])) {
+            return false; // No expiration in token
+        }
+
+        // Recompute signature
+        $expectedSignature = $this->base64UrlEncode(hash_hmac('sha256', $payloadJson, $this->secretKey, true));
+
+        // Compare signatures
+        if (!hash_equals($expectedSignature, $encodedSignature)) {
+            return false; // Signature does not match
+        }
+
+        // Check expiration
+        return ($payload['exp'] > time()); // true if not expired and signature matches
     }
 }

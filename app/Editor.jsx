@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import
 {
     View,
@@ -17,6 +17,7 @@ import Console from '../components/Console';
 import CodeEditor from '../components/CodeEditor';
 import ExerciseInstructions from '../components/ExerciseInstructions';
 import { API_URL, API_KEY } from '../constants/API_constants';
+import { AuthContext } from '../contexts/AuthContext';
 
 export default function Editor()
 {
@@ -32,6 +33,7 @@ export default function Editor()
     const [consoleOutput, setConsoleOutput] = useState('');
 
     const [exercises, setExercises] = useState([]);
+    const { userToken } = useContext(AuthContext); // Get token from AuthContext
 
     const handleRunCode = async () =>
     {
@@ -49,6 +51,7 @@ export default function Editor()
                 headers: {
                     "Content-Type": "application/json",
                     "X-API-KEY": API_KEY,
+                    ...(userToken ? { "Authorization": `Bearer ${userToken}` } : {}),
                 },
                 body: JSON.stringify({
                     code: code,
@@ -119,6 +122,7 @@ export default function Editor()
                     headers: {
                         'Content-Type': 'application/json',
                         'X-API-KEY': API_KEY,
+                        ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {}),
                     },
                 });
                 if (!response.ok)
@@ -145,7 +149,7 @@ export default function Editor()
             }
         };
         fetchExercises();
-    }, []);
+    }, [userToken]);
 
     return (
         <LinearGradient
