@@ -11,6 +11,40 @@ export const AuthProvider = ({ children }) =>
     const [userToken, setUserToken] = useState('');
     const [isLoading, setIsLoading] = useState(true);
 
+    // Helper functions for token storage
+    const setToken = async (token) =>
+    {
+        if (Platform.OS !== 'web')
+        {
+            await SecureStore.setItemAsync('userToken', token);
+        } else
+        {
+            localStorage.setItem('userToken', token);
+        }
+    };
+
+    const getToken = async () =>
+    {
+        if (Platform.OS !== 'web')
+        {
+            return await SecureStore.getItemAsync('userToken');
+        } else
+        {
+            return localStorage.getItem('userToken');
+        }
+    };
+
+    const deleteToken = async () =>
+    {
+        if (Platform.OS !== 'web')
+        {
+            await SecureStore.deleteItemAsync('userToken');
+        } else
+        {
+            localStorage.removeItem('userToken');
+        }
+    };
+
     const login = async (username, password) =>
     {
         try
@@ -37,18 +71,12 @@ export const AuthProvider = ({ children }) =>
 
             if (jsonData.token)
             {
-                if (Platform.OS !== 'web')
-                {
-                    await SecureStore.setItemAsync('userToken', jsonData.token);
-                } else
-                {
-                    localStorage.setItem('userToken', jsonData.token);
-                }
+                await setToken(jsonData.token);
                 setUserToken(jsonData.token);
             }
         } catch (error)
         {
-            console.error('Error during login:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+            console.error('Error during login:', error);
         } finally
         {
             setIsLoading(false);
@@ -57,13 +85,7 @@ export const AuthProvider = ({ children }) =>
 
     const logout = async () =>
     {
-        if (Platform.OS !== 'web')
-        {
-            await SecureStore.deleteItemAsync('userToken');
-        } else
-        {
-            localStorage.removeItem('userToken');
-        }
+        await deleteToken();
         setUserToken(null);
     };
 
@@ -71,15 +93,8 @@ export const AuthProvider = ({ children }) =>
     {
         try
         {
-            if (Platform.OS !== 'web')
-            {
-                const token = await SecureStore.getItemAsync('userToken');
-                if (token) setUserToken(token);
-            } else
-            {
-                const token = localStorage.getItem('userToken');
-                if (token) setUserToken(token);
-            }
+            const token = await getToken();
+            if (token) setUserToken(token);
         } catch (e)
         {
             console.log('No token found');

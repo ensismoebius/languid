@@ -8,10 +8,18 @@ import Icon from 'react-native-vector-icons/Feather';
 
 export default function LoginScreen()
 {
-  const router = useRouter();
   const styles = createStyles();
 
   const { login, userToken } = useContext(AuthContext);
+  const router = useRouter();
+
+  React.useEffect(() =>
+  {
+    if (userToken)
+    {
+      router.replace('/Editor');
+    }
+  }, [userToken]);
 
   const [username, setUser] = useState('');
   const [password, setPass] = useState('');
@@ -27,10 +35,7 @@ export default function LoginScreen()
     try
     {
       await login(username, password);
-      if (userToken)
-      {
-        router.push('/Editor');
-      }
+      // Navigation will be handled by useEffect when userToken updates
     } catch (err)
     {
       setError('Invalid login credentials');
