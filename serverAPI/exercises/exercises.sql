@@ -89,3 +89,6 @@ INSERT INTO exercise (title, instructions, testFileName) VALUES
 ('Classe Agenda', 
 'Crie uma classe Agenda que armazena até 10 nomes. Implemente métodos para adicionar e listar nomes.\n\nResultado esperado:\nAdicionados: Ana, João\nLista: Ana, João\n\nDica: Use array de strings.', 
 '29_test.cpp');
+
+
+SELECT E.id, E.title, E.testFileName, UE.done FROM exercise as E left join user_exercise as UE on E.id = UE.exerciseId;

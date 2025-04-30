@@ -135,7 +135,7 @@ export default function Editor()
                         id: ex.id,
                         title: ex.title,
                         instruction: ex.instructions || ex.instruction || '',
-                        done: false,
+                        done: Boolean(ex.done),
                         testFileName: ex.testFileName || '',
                     })));
                 } else
