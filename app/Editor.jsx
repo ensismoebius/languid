@@ -18,7 +18,7 @@ import CodeEditor from '../components/CodeEditor';
 import ExerciseInstructions from '../components/ExerciseInstructions';
 import { API_URL, API_KEY } from '../constants/API_constants';
 import { AuthContext } from '../contexts/AuthContext';
-import { useRouter } from 'expo-router';
+import { useRouter, useRootNavigationState } from 'expo-router';
 import { apiRequest } from '../utils/api';
 
 export default function Editor()
@@ -37,6 +37,7 @@ export default function Editor()
     const [exercises, setExercises] = useState([]);
     const { userToken } = useContext(AuthContext); // Get token from AuthContext
     const router = useRouter();
+    const navigationState = useRootNavigationState();
 
     // Helper to update exercise status
     const updateExerciseStatus = (done) =>
@@ -138,6 +139,15 @@ export default function Editor()
         };
         fetchExercises();
     }, [userToken]);
+
+    useEffect(() =>
+    {
+        // Redirect to login if not authenticated, but only after navigation is ready
+        if (navigationState?.key && !userToken)
+        {
+            router.replace('/');
+        }
+    }, [userToken, navigationState]);
 
     return (
         <LinearGradient
