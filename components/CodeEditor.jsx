@@ -37,7 +37,7 @@ export default function CodeEditor({ styles, code, setCode, selection, setSelect
                 onKeyPress={handleKeyPress}
                 selection={selection}
                 accessibilityLabel="Editor de código. Digite seu código aqui."
-                accessibilityRole="textbox"
+                accessibilityRole="text"
                 accessible
             />
         </ScrollView>

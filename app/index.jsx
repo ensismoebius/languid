@@ -54,7 +54,7 @@ export default function LoginScreen()
           onChangeText={setUser}
           style={styles.input}
           accessibilityLabel="Campo de login"
-          accessibilityRole="textbox"
+          accessibilityRole="text"
           accessible
         />
 
@@ -65,7 +65,7 @@ export default function LoginScreen()
             onChangeText={setPass}
             style={styles.password}
             accessibilityLabel="Campo de senha"
-            accessibilityRole="textbox"
+            accessibilityRole="text"
             accessible
           />
           <TouchableOpacity

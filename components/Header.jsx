@@ -58,7 +58,7 @@ export default function Header({ styles, headerHeight, handleRunCode, executing,
             </View>
 
             <TouchableOpacity onPress={onOpenAccessibility} accessibilityLabel="Abrir opções de acessibilidade" accessibilityRole="button" style={{ marginLeft: 10 }}>
-                <MaterialCommunityIcons name="accessibility" size={28} color="#fff" accessibilityLabel="Ícone de acessibilidade" importantForAccessibility="yes" />
+                <MaterialCommunityIcons name="human-wheelchair" size={28} color="#fff" accessibilityLabel="Ícone de acessibilidade" importantForAccessibility="yes" />
             </TouchableOpacity>
 
             <LogoutButton requestLogout={requestLogout} />
