@@ -8,7 +8,8 @@ import
     ScrollView,
     Keyboard,
     TextInput,
-    ActivityIndicator
+    ActivityIndicator,
+    Modal
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { createStyles } from '../css/editor_css';
@@ -192,6 +193,111 @@ export default function Editor()
         }
     }, [currentExercise, exercises]);
 
+    const [showUnsavedModal, setShowUnsavedModal] = useState(false);
+    const [pendingAction, setPendingAction] = useState(null); // { type: 'switch'|'logout'|'navigate', value: any }
+
+    // Helper to check for unsaved changes
+    const hasUnsavedChanges = () =>
+    {
+        return exercises.length > 0 && exercises[currentExercise] && code !== exercises[currentExercise].code;
+    };
+
+    // Intercept exercise switch
+    const requestExerciseSwitch = (index) =>
+    {
+        if (index === currentExercise) return;
+        if (hasUnsavedChanges())
+        {
+            setPendingAction({ type: 'switch', value: index });
+            setShowUnsavedModal(true);
+        } else
+        {
+            setCurrentExercise(index);
+            setShowConsole(false);
+            setCode(exercises[index].code);
+            Keyboard.dismiss();
+        }
+    };
+
+    // Intercept logout
+    const requestLogout = () =>
+    {
+        if (hasUnsavedChanges())
+        {
+            setPendingAction({ type: 'logout' });
+            setShowUnsavedModal(true);
+        } else
+        {
+            doLogout();
+        }
+    };
+
+    // Intercept navigation away (browser/tab close)
+    useEffect(() =>
+    {
+        const beforeUnload = (e) =>
+        {
+            if (hasUnsavedChanges())
+            {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+        };
+        window.addEventListener('beforeunload', beforeUnload);
+        return () => window.removeEventListener('beforeunload', beforeUnload);
+    }, [code, exercises, currentExercise]);
+
+    // Actual logout
+    const { logout } = useContext(AuthContext);
+    const doLogout = async () =>
+    {
+        await logout();
+        router.replace('/');
+    };
+
+    // Handle modal actions
+    const handleModalAction = async (action) =>
+    {
+        setShowUnsavedModal(false);
+        if (action === 'save')
+        {
+            setExercises(prev =>
+            {
+                const updated = [...prev];
+                if (updated[currentExercise]) updated[currentExercise].code = code;
+                return updated;
+            });
+            if (pendingAction?.type === 'switch')
+            {
+                setCurrentExercise(pendingAction.value);
+                setShowConsole(false);
+                setCode(exercises[pendingAction.value].code);
+                Keyboard.dismiss();
+            } else if (pendingAction?.type === 'logout')
+            {
+                await doLogout();
+            }
+            setPendingAction(null);
+        } else if (action === 'discard')
+        {
+            if (pendingAction?.type === 'switch')
+            {
+                setCurrentExercise(pendingAction.value);
+                setShowConsole(false);
+                setCode(exercises[pendingAction.value].code);
+                Keyboard.dismiss();
+            } else if (pendingAction?.type === 'logout')
+            {
+                await doLogout();
+            }
+            setPendingAction(null);
+        } else
+        {
+            setPendingAction(null);
+        }
+    };
+
     return (
         <LinearGradient
             colors={['#FF6B6B', '#FF8E53', '#FFAF40']}
@@ -205,10 +311,11 @@ export default function Editor()
                 handleRunCode={handleRunCode}
                 executing={executing}
                 exercises={exercises}
-                setCurrentExercise={setCurrentExercise}
+                setCurrentExercise={requestExerciseSwitch}
                 currentExercise={currentExercise}
                 setShowConsole={setShowConsole}
                 setCode={setCode}
+                requestLogout={requestLogout}
             />
 
             <CodeEditor
@@ -236,6 +343,31 @@ export default function Editor()
                     </Text>
                 </View>
             )}
+
+            <Modal
+                visible={showUnsavedModal}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setShowUnsavedModal(false)}
+            >
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <View style={{ backgroundColor: '#fff', padding: 24, borderRadius: 10, width: 300 }}>
+                        <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>Você tem alterações não salvas.</Text>
+                        <Text style={{ marginBottom: 20 }}>Deseja salvar antes de continuar?</Text>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <TouchableOpacity onPress={() => handleModalAction('save')} style={{ padding: 10 }}>
+                                <Text style={{ color: '#2196F3', fontWeight: 'bold' }}>Salvar e continuar</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => handleModalAction('discard')} style={{ padding: 10 }}>
+                                <Text style={{ color: '#f44336', fontWeight: 'bold' }}>Descartar alterações</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => handleModalAction('cancel')} style={{ padding: 10 }}>
+                                <Text style={{ color: '#333', fontWeight: 'bold' }}>Cancelar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </LinearGradient>
     );
 }
