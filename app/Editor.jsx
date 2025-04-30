@@ -63,6 +63,14 @@ export default function Editor()
 
     const handleRunCode = async () =>
     {
+        // Update code in current exercise
+        setExercises(prev =>
+        {
+            const updated = [...prev];
+            if (updated[currentExercise]) updated[currentExercise].code = code;
+            return updated;
+        });
+
         if (executing) return;
         setExecuting(true);
         setShowConsole(true);
@@ -132,6 +140,7 @@ export default function Editor()
                         instruction: ex.instructions || ex.instruction || '',
                         done: Boolean(ex.done == 1),
                         testFileName: ex.testFileName || '',
+                        code: ex.code || ''
                     })));
                 } else
                 {
@@ -167,10 +176,10 @@ export default function Editor()
                 handleRunCode={handleRunCode}
                 executing={executing}
                 exercises={exercises}
-                currentExercise={currentExercise}
                 setCurrentExercise={setCurrentExercise}
-                setCode={setCode}
+                currentExercise={currentExercise}
                 setShowConsole={setShowConsole}
+                setCode={setCode}
             />
 
             <CodeEditor
