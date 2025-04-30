@@ -137,14 +137,14 @@ class APIExercisesHandler
             $loginId !== null &&
             $exerciseId !== "0"
         ) {
-            $this->handleExerciseDone($loginId, $exerciseId);
+            $this->handleExerciseDone($loginId, $exerciseId, $code);
         }
         $response = ["message" => $testResult ?? "No output", "status" => is_null($testResult) ? "fail" : "success"];
         echo json_encode($response);
         exit;
     }
 
-    private function handleExerciseDone($loginId, $exerciseId)
+    private function handleExerciseDone($loginId, $exerciseId, $code)
     {
         $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         if ($conn->connect_error) {
@@ -152,9 +152,9 @@ class APIExercisesHandler
         }
         $loginId = intval($loginId);
         $exerciseId = intval($exerciseId);
-        $stmt = $conn->prepare("INSERT INTO user_exercise (loginId, exerciseId, done) VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE done=1");
+        $stmt = $conn->prepare("INSERT INTO user_exercise (loginId, exerciseId, done, code) VALUES (?, ?, 1, ?) ON DUPLICATE KEY UPDATE done=1, code=VALUES(code)");
         if ($stmt) {
-            $stmt->bind_param("ii", $loginId, $exerciseId);
+            $stmt->bind_param("iis", $loginId, $exerciseId, $code);
             $stmt->execute();
             $stmt->close();
         }

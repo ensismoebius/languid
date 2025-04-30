@@ -93,7 +93,12 @@ export default function Editor()
                 updateExerciseStatus(true);
             } else
             {
-                setConsoleOutput(`Falhas: ${failures} - Tente novamente`);
+                const failureDetails = testsData.testsuites
+                    .flatMap(suite => suite.testsuite)
+                    .flatMap(test => test.failures)
+                    .map(failure => failure.failure)
+                    .join('\n\n');
+                setConsoleOutput(`Falhas: ${failures}:\n${failureDetails}`);
                 updateExerciseStatus(false);
             }
         } catch (error)
@@ -125,7 +130,7 @@ export default function Editor()
                         id: ex.id,
                         title: ex.title,
                         instruction: ex.instructions || ex.instruction || '',
-                        done: Boolean(ex.done),
+                        done: Boolean(ex.done == 1),
                         testFileName: ex.testFileName || '',
                     })));
                 } else

@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS user_exercise (
     loginId INT NOT NULL,
     exerciseId INT NOT NULL,
     done BOOLEAN DEFAULT FALSE,
+    code varchar(5000) NOT NULL,
     PRIMARY KEY (loginId, exerciseId),
     FOREIGN KEY (loginId) REFERENCES user(id),
     FOREIGN KEY (exerciseId) REFERENCES exercise(id)
