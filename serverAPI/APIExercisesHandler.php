@@ -96,42 +96,69 @@ class APIExercisesHandler
     private function handlePostRequest()
     {
         $input = json_decode(file_get_contents("php://input"), true);
-
         if (!$input) {
-            echo json_encode(
-                [
-                    "status" => "error",
-                    "message" => "Invalid JSON data"
-                ]
-            );
+            echo json_encode(["status" => "error", "message" => "Invalid JSON data"]);
             exit;
         }
-
         $input = $this->sanitizeInput($input);
-
         if (isset($input['username']) && isset($input['password'])) {
             $result = $this->handleLogin($input['username'], $input['password']);
             echo $result;
             exit;
         }
-
-        // Require valid token for all other POST requests
         $this->requireValidToken();
 
         $code = $input["code"] ?? "";
-        $exercise = $input["exercise"] ?? "-1";
+        $exercise = $input["exercise"] ?? "";
+        $exerciseId = $input["exerciseId"] ?? "0";
+        $token = $this->getBearerToken();
+
+        $parts = explode('.', $token);
+        if (count($parts) !== 2) {
+            return false; // Invalid token format
+        }
+
+        list($encodedPayload, $encodedSignature) = $parts;
+
+        // Decode payload
+        $payloadJson = base64_decode(strtr($encodedPayload, '-_', '+/'));
+        $payload = json_decode($payloadJson, true);
+
+        $loginId = $payload['sub'] ?? null;
 
         $tester = new CodeTester();
         $tester->setCodeAndExercise($code, $exercise);
         $testResult = $tester->runTests();
 
-        $response = [
-            "message" => $testResult ?? "No output",
-            "status" => is_null($testResult) ? "fail" : "success"
-        ];
+        $testResultJson = json_decode($testResult);
 
+        if (
+            $testResultJson->failures == 0 &&
+            $loginId !== null &&
+            $exerciseId !== "0"
+        ) {
+            $this->handleExerciseDone($loginId, $exerciseId);
+        }
+        $response = ["message" => $testResult ?? "No output", "status" => is_null($testResult) ? "fail" : "success"];
         echo json_encode($response);
         exit;
+    }
+
+    private function handleExerciseDone($loginId, $exerciseId)
+    {
+        $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        if ($conn->connect_error) {
+            return;
+        }
+        $loginId = intval($loginId);
+        $exerciseId = intval($exerciseId);
+        $stmt = $conn->prepare("INSERT INTO user_exercise (loginId, exerciseId, done) VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE done=1");
+        if ($stmt) {
+            $stmt->bind_param("ii", $loginId, $exerciseId);
+            $stmt->execute();
+            $stmt->close();
+        }
+        $conn->close();
     }
 
     private function handleGetRequest()

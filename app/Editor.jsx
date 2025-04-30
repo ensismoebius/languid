@@ -77,7 +77,8 @@ export default function Editor()
                 },
                 body: JSON.stringify({
                     code,
-                    exercise: exercises[currentExercise]?.testFileName
+                    exerciseId: exercises[currentExercise]?.id,
+                    exercise: exercises[currentExercise]?.testFileName,
                 }),
             });
             if (!response.ok && handleUnauthorized(response)) return;
