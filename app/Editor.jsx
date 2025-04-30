@@ -195,6 +195,7 @@ export default function Editor()
 
     const [showUnsavedModal, setShowUnsavedModal] = useState(false);
     const [pendingAction, setPendingAction] = useState(null); // { type: 'switch'|'logout'|'navigate', value: any }
+    const [modalError, setModalError] = useState('');
 
     // Helper to check for unsaved changes
     const hasUnsavedChanges = () =>
@@ -259,26 +260,34 @@ export default function Editor()
     // Handle modal actions
     const handleModalAction = async (action) =>
     {
+        setModalError('');
         setShowUnsavedModal(false);
         if (action === 'save')
         {
-            setExercises(prev =>
+            try
             {
-                const updated = [...prev];
-                if (updated[currentExercise]) updated[currentExercise].code = code;
-                return updated;
-            });
-            if (pendingAction?.type === 'switch')
+                setExercises(prev =>
+                {
+                    const updated = [...prev];
+                    if (updated[currentExercise]) updated[currentExercise].code = code;
+                    return updated;
+                });
+                if (pendingAction?.type === 'switch')
+                {
+                    setCurrentExercise(pendingAction.value);
+                    setShowConsole(false);
+                    setCode(exercises[pendingAction.value].code);
+                    Keyboard.dismiss();
+                } else if (pendingAction?.type === 'logout')
+                {
+                    await doLogout();
+                }
+                setPendingAction(null);
+            } catch (err)
             {
-                setCurrentExercise(pendingAction.value);
-                setShowConsole(false);
-                setCode(exercises[pendingAction.value].code);
-                Keyboard.dismiss();
-            } else if (pendingAction?.type === 'logout')
-            {
-                await doLogout();
+                setModalError('Erro ao salvar alterações. Tente novamente ou descarte as alterações.');
+                setShowUnsavedModal(true);
             }
-            setPendingAction(null);
         } else if (action === 'discard')
         {
             if (pendingAction?.type === 'switch')
@@ -354,6 +363,9 @@ export default function Editor()
                     <View style={{ backgroundColor: '#fff', padding: 24, borderRadius: 10, width: 300 }}>
                         <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>Você tem alterações não salvas.</Text>
                         <Text style={{ marginBottom: 20 }}>Deseja salvar antes de continuar?</Text>
+                        {modalError ? (
+                            <Text style={{ color: '#f44336', marginBottom: 10 }}>{modalError}</Text>
+                        ) : null}
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <TouchableOpacity onPress={() => handleModalAction('save')} style={{ padding: 10 }}>
                                 <Text style={{ color: '#2196F3', fontWeight: 'bold' }}>Salvar e continuar</Text>
