@@ -170,7 +170,7 @@ class APIExercisesHandler
             exit;
         }
 
-        $sql = "SELECT E.id, E.title, E.testFileName, COALESCE(UE.done, 0) as done FROM exercise as E LEFT JOIN user_exercise as UE ON E.id = UE.exerciseId;";
+        $sql = "SELECT E.id, E.title, E.testFileName, E.instructions, COALESCE(UE.done, 0) as done FROM exercise as E LEFT JOIN user_exercise as UE ON E.id = UE.exerciseId;";
         $result = $conn->query($sql);
         $exercises = [];
         if ($result && $result->num_rows > 0) {
