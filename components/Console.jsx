@@ -19,7 +19,7 @@ export default function Console({ styles, consoleOutput, showConsole })
     if (!showConsole) return null;
 
     return (
-        <View style={styles.consoleContainer}>
+        <View style={styles.consoleContainer} accessible accessibilityRole="text" accessibilityLiveRegion="polite" accessibilityLabel="Saída do console">
             <View style={styles.consoleHeader}>
                 <Text style={styles.consoleTitle}>Console Output</Text>
             </View>

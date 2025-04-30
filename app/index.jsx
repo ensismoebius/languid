@@ -53,6 +53,9 @@ export default function LoginScreen()
           placeholder="login"
           onChangeText={setUser}
           style={styles.input}
+          accessibilityLabel="Campo de login"
+          accessibilityRole="textbox"
+          accessible
         />
 
         <View style={{ position: 'relative' }}>
@@ -61,11 +64,16 @@ export default function LoginScreen()
             secureTextEntry={hidden}
             onChangeText={setPass}
             style={styles.password}
+            accessibilityLabel="Campo de senha"
+            accessibilityRole="textbox"
+            accessible
           />
           <TouchableOpacity
             onPress={() => setHidden(!hidden)}
             style={styles.passIcon}
             accessibilityLabel={hidden ? "Mostrar senha" : "Ocultar senha"}
+            accessibilityRole="button"
+            accessible
           >
             <Icon name={hidden ? "eye-off" : "eye"} size={20} />
           </TouchableOpacity>

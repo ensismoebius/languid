@@ -307,9 +307,29 @@ export default function Editor()
         }
     };
 
+    const [theme, setTheme] = useState('default'); // 'default' | 'high-contrast' | 'light' | 'dark'
+    const [showAccessibilityModal, setShowAccessibilityModal] = useState(false);
+
+    // Theme styles
+    const getThemeColors = () =>
+    {
+        if (theme === 'high-contrast')
+        {
+            return ['#000', '#fff', '#ff0']; // black bg, white fg, yellow accent
+        } else if (theme === 'light')
+        {
+            return ['#fff', '#eee', '#2196F3'];
+        } else if (theme === 'dark')
+        {
+            return ['#222', '#333', '#FF8E53'];
+        }
+        return ['#FF6B6B', '#FF8E53', '#FFAF40']; // default
+    };
+    const themeColors = getThemeColors();
+
     return (
         <LinearGradient
-            colors={['#FF6B6B', '#FF8E53', '#FFAF40']}
+            colors={themeColors}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.container}
@@ -325,6 +345,7 @@ export default function Editor()
                 setShowConsole={setShowConsole}
                 setCode={setCode}
                 requestLogout={requestLogout}
+                onOpenAccessibility={() => setShowAccessibilityModal(true)}
             />
 
             <CodeEditor
@@ -358,25 +379,55 @@ export default function Editor()
                 transparent
                 animationType="fade"
                 onRequestClose={() => setShowUnsavedModal(false)}
+                accessible accessibilityViewIsModal accessibilityLabel="Alerta de alterações não salvas"
             >
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
                     <View style={{ backgroundColor: '#fff', padding: 24, borderRadius: 10, width: 300 }}>
-                        <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>Você tem alterações não salvas.</Text>
+                        <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12 }} accessibilityRole="header">Você tem alterações não salvas.</Text>
                         <Text style={{ marginBottom: 20 }}>Deseja salvar antes de continuar?</Text>
                         {modalError ? (
                             <Text style={{ color: '#f44336', marginBottom: 10 }}>{modalError}</Text>
                         ) : null}
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <TouchableOpacity onPress={() => handleModalAction('save')} style={{ padding: 10 }}>
+                            <TouchableOpacity onPress={() => handleModalAction('save')} style={{ padding: 10 }} accessibilityLabel="Salvar e continuar" accessibilityRole="button">
                                 <Text style={{ color: '#2196F3', fontWeight: 'bold' }}>Salvar e continuar</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => handleModalAction('discard')} style={{ padding: 10 }}>
+                            <TouchableOpacity onPress={() => handleModalAction('discard')} style={{ padding: 10 }} accessibilityLabel="Descartar alterações" accessibilityRole="button">
                                 <Text style={{ color: '#f44336', fontWeight: 'bold' }}>Descartar alterações</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => handleModalAction('cancel')} style={{ padding: 10 }}>
+                            <TouchableOpacity onPress={() => handleModalAction('cancel')} style={{ padding: 10 }} accessibilityLabel="Cancelar" accessibilityRole="button">
                                 <Text style={{ color: '#333', fontWeight: 'bold' }}>Cancelar</Text>
                             </TouchableOpacity>
                         </View>
+                    </View>
+                </View>
+            </Modal>
+
+            <Modal
+                visible={showAccessibilityModal}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setShowAccessibilityModal(false)}
+                accessible accessibilityViewIsModal accessibilityLabel="Opções de acessibilidade"
+            >
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <View style={{ backgroundColor: '#fff', padding: 24, borderRadius: 10, width: 300 }}>
+                        <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>Acessibilidade</Text>
+                        <TouchableOpacity onPress={() => { setTheme('high-contrast'); setShowAccessibilityModal(false); }} accessibilityLabel="Ativar alto contraste" accessibilityRole="button" style={{ padding: 10 }}>
+                            <Text style={{ color: '#000', fontWeight: 'bold' }}>Alto contraste</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => { setTheme('light'); setShowAccessibilityModal(false); }} accessibilityLabel="Ativar modo claro" accessibilityRole="button" style={{ padding: 10 }}>
+                            <Text style={{ color: '#2196F3', fontWeight: 'bold' }}>Modo claro</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => { setTheme('dark'); setShowAccessibilityModal(false); }} accessibilityLabel="Ativar modo escuro" accessibilityRole="button" style={{ padding: 10 }}>
+                            <Text style={{ color: '#333', fontWeight: 'bold' }}>Modo escuro</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => { setTheme('default'); setShowAccessibilityModal(false); }} accessibilityLabel="Restaurar tema padrão" accessibilityRole="button" style={{ padding: 10 }}>
+                            <Text style={{ color: '#FF6B6B', fontWeight: 'bold' }}>Tema padrão</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => setShowAccessibilityModal(false)} accessibilityLabel="Fechar opções de acessibilidade" accessibilityRole="button" style={{ padding: 10, marginTop: 10 }}>
+                            <Text style={{ color: '#f44336', fontWeight: 'bold' }}>Fechar</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </Modal>

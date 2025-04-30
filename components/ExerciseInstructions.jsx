@@ -13,6 +13,8 @@ export default function ExerciseInstructions({ styles, instruction })
             autoCorrect={false}
             spellCheck={false}
             accessibilityLabel="Instruções do exercício"
+            accessibilityRole="text"
+            accessibilityLiveRegion="polite"
         />
     );
 }

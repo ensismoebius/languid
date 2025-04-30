@@ -6,7 +6,7 @@ import ExecutingButton from './ExecutingButton';
 import ExercisesList from './ExercisesList';
 import LogoutButton from './LogoutButton';
 
-export default function Header({ styles, headerHeight, handleRunCode, executing, exercises, setCurrentExercise, currentExercise, setShowConsole, setCode })
+export default function Header({ styles, headerHeight, handleRunCode, executing, exercises, setCurrentExercise, currentExercise, setShowConsole, setCode, requestLogout, onOpenAccessibility })
 {
     const handleExerciseSelect = (index) =>
     {
@@ -43,20 +43,25 @@ export default function Header({ styles, headerHeight, handleRunCode, executing,
                 handleExerciseSelect={handleExerciseSelect}
             />
 
-            <Text style={styles.exerciseCounter}>
+            <Text style={styles.exerciseCounter} accessibilityLabel={`Exercício ${currentExercise + 1} de ${exercises.length}`}
+                accessible accessibilityRole="text">
                 {currentExercise + 1}/{exercises.length}
             </Text>
 
             <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
-                <TouchableOpacity onPress={goPrev} disabled={isFirst} accessibilityLabel="Exercício anterior">
-                    <MaterialCommunityIcons name="chevron-left-circle" size={32} color={isFirst ? '#bbb' : '#fff'} />
+                <TouchableOpacity onPress={goPrev} disabled={isFirst} accessibilityLabel="Exercício anterior" accessibilityRole="button">
+                    <MaterialCommunityIcons name="chevron-left-circle" size={32} color={isFirst ? '#bbb' : '#fff'} accessibilityLabel="Ícone de seta para exercício anterior" importantForAccessibility="yes" />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={goNext} disabled={isLast} accessibilityLabel="Próximo exercício">
-                    <MaterialCommunityIcons name="chevron-right-circle" size={32} color={isLast ? '#bbb' : '#fff'} />
+                <TouchableOpacity onPress={goNext} disabled={isLast} accessibilityLabel="Próximo exercício" accessibilityRole="button">
+                    <MaterialCommunityIcons name="chevron-right-circle" size={32} color={isLast ? '#bbb' : '#fff'} accessibilityLabel="Ícone de seta para próximo exercício" importantForAccessibility="yes" />
                 </TouchableOpacity>
             </View>
 
-            <LogoutButton />
+            <TouchableOpacity onPress={onOpenAccessibility} accessibilityLabel="Abrir opções de acessibilidade" accessibilityRole="button" style={{ marginLeft: 10 }}>
+                <MaterialCommunityIcons name="accessibility" size={28} color="#fff" accessibilityLabel="Ícone de acessibilidade" importantForAccessibility="yes" />
+            </TouchableOpacity>
+
+            <LogoutButton requestLogout={requestLogout} />
         </View>
     );
 }
