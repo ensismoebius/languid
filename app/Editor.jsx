@@ -63,14 +63,18 @@ export default function Editor()
 
     const handleRunCode = async () =>
     {
-        // Update code in current exercise
+        if (!code || code.trim() === '')
+        {
+            setShowConsole(true);
+            setConsoleOutput('Por favor, escreva algum código antes de executar.');
+            return;
+        }
         setExercises(prev =>
         {
             const updated = [...prev];
             if (updated[currentExercise]) updated[currentExercise].code = code;
             return updated;
         });
-
         if (executing) return;
         setExecuting(true);
         setShowConsole(true);
@@ -89,7 +93,7 @@ export default function Editor()
             });
             if (jsonData.status !== 'success')
             {
-                setConsoleOutput(`Error: ${jsonData.message}`);
+                setConsoleOutput(`Erro do servidor: ${jsonData.message || 'Resposta inesperada do servidor.'}`);
                 updateExerciseStatus(false);
                 return;
             }
@@ -111,7 +115,13 @@ export default function Editor()
             }
         } catch (error)
         {
-            setConsoleOutput(`Error: ${error.message}`);
+            if (error.message && error.message.toLowerCase().includes('network'))
+            {
+                setConsoleOutput('Erro de rede: Não foi possível conectar ao servidor. Verifique sua conexão com a internet.');
+            } else
+            {
+                setConsoleOutput(`Erro inesperado: ${error.message || error}`);
+            }
         } finally
         {
             setExecuting(false);
@@ -145,9 +155,19 @@ export default function Editor()
                 } else
                 {
                     setExercises([]);
+                    setConsoleOutput(`Erro ao carregar exercícios: ${jsonData.message || 'Resposta inesperada do servidor.'}`);
+                    setShowConsole(true);
                 }
             } catch (error)
             {
+                if (error.message && error.message.toLowerCase().includes('network'))
+                {
+                    setConsoleOutput('Erro de rede: Não foi possível carregar os exercícios. Verifique sua conexão com a internet.');
+                } else
+                {
+                    setConsoleOutput(`Erro inesperado ao carregar exercícios: ${error.message || error}`);
+                }
+                setShowConsole(true);
                 setExercises([]);
             }
         };
@@ -162,6 +182,15 @@ export default function Editor()
             router.replace('/');
         }
     }, [userToken, navigationState]);
+
+    useEffect(() =>
+    {
+        // When currentExercise changes, update code editor with the code for the selected exercise
+        if (exercises.length > 0 && exercises[currentExercise])
+        {
+            setCode(exercises[currentExercise].code || '');
+        }
+    }, [currentExercise, exercises]);
 
     return (
         <LinearGradient
@@ -200,6 +229,13 @@ export default function Editor()
                 styles={styles}
                 instruction={exercises.length > 0 && exercises[currentExercise] ? exercises[currentExercise].instruction : ''}
             />
+            {exercises.length === 0 && (
+                <View style={{ padding: 20, alignItems: 'center' }}>
+                    <Text style={{ color: '#fff', fontSize: 18, textAlign: 'center' }}>
+                        Nenhum exercício disponível no momento. Tente novamente mais tarde ou contate o suporte.
+                    </Text>
+                </View>
+            )}
         </LinearGradient>
     );
 }
