@@ -19,6 +19,7 @@ import ExerciseInstructions from '../components/ExerciseInstructions';
 import { API_URL, API_KEY } from '../constants/API_constants';
 import { AuthContext } from '../contexts/AuthContext';
 import { useRouter } from 'expo-router';
+import { apiRequest } from '../utils/api';
 
 export default function Editor()
 {
@@ -68,21 +69,15 @@ export default function Editor()
         Keyboard.dismiss();
         try
         {
-            const response = await fetch(API_URL, {
+            const jsonData = await apiRequest({
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-API-KEY": API_KEY,
-                    ...(userToken ? { "Authorization": `Bearer ${userToken}` } : {}),
-                },
-                body: JSON.stringify({
+                body: {
                     code,
                     exerciseId: exercises[currentExercise]?.id,
                     exercise: exercises[currentExercise]?.testFileName,
-                }),
+                },
+                userToken
             });
-            if (!response.ok && handleUnauthorized(response)) return;
-            const jsonData = await response.json();
             if (jsonData.status !== 'success')
             {
                 setConsoleOutput(`Error: ${jsonData.message}`);
@@ -119,16 +114,10 @@ export default function Editor()
         {
             try
             {
-                const response = await fetch(API_URL, {
+                const jsonData = await apiRequest({
                     method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-API-KEY': API_KEY,
-                        ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {}),
-                    },
+                    userToken
                 });
-                if (!response.ok && handleUnauthorized(response)) return;
-                const jsonData = await response.json();
                 if (jsonData.status === 'success' && Array.isArray(jsonData.exercises))
                 {
                     setExercises(jsonData.exercises.map(ex => ({
@@ -142,7 +131,7 @@ export default function Editor()
                 {
                     setExercises([]);
                 }
-            } catch
+            } catch (error)
             {
                 setExercises([]);
             }
