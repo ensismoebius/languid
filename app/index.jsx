@@ -58,7 +58,7 @@ export default function LoginScreen()
           accessible
         />
 
-        <View style={{ position: 'relative' }}>
+        <View style={styles.passwordContainer}>
           <TextInput
             placeholder="senha"
             secureTextEntry={hidden}
