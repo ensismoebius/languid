@@ -31,3 +31,6 @@ serverAPI/tools/vendor/
 
 expo-env.d.ts
 # @end expo-cli
+
+# Ignore csv files
+*.csv

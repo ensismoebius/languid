@@ -377,7 +377,7 @@ export default function Editor()
             <Modal
                 visible={showUnsavedModal}
                 transparent
-                animationType="fade"
+                animationType="slide"
                 onRequestClose={() => setShowUnsavedModal(false)}
                 accessible accessibilityViewIsModal accessibilityLabel="Alerta de alterações não salvas"
             >
@@ -406,7 +406,7 @@ export default function Editor()
             <Modal
                 visible={showAccessibilityModal}
                 transparent
-                animationType="fade"
+                animationType="slide"
                 onRequestClose={() => setShowAccessibilityModal(false)}
                 accessible accessibilityViewIsModal accessibilityLabel="Opções de acessibilidade"
             >

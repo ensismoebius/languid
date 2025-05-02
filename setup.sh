@@ -97,3 +97,27 @@ mysql -h "$DB_HOST" -u "$DB_LOGIN" -p"$DB_PASSWORD" < insert_default_user.sql
 
 # Clean up the SQL script
 rm insert_default_user.sql
+
+
+DB_NAME="languid"
+DB_USER="andre"
+DB_PASS="1234"
+CSV_FILE="alunos.csv"
+
+while IFS=$'\t' read -r RM NOME GRUPO; do
+    # Pula o cabeçalho
+    if [[ "$RM" == "RM" ]]; then
+        continue
+    fi
+
+    # Remove espaços extras do nome (email)
+    EMAIL=$(echo "$NOME" | xargs)
+
+    # Gera hash MD5 da RM
+    HASH=$(echo -n "$RM" | md5sum | awk '{print $1}')
+
+    # Insere no banco
+    mysql -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -e \
+    "INSERT INTO user (email, passwdHash) VALUES ('$EMAIL', '$HASH') ON DUPLICATE KEY UPDATE email=email;"
+done < "$CSV_FILE"
+
