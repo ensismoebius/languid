@@ -19,27 +19,21 @@ export default function CodeEditor({ styles, code, setCode, selection, setSelect
     };
 
     return (
-        <ScrollView
-            style={styles.scrollView}
-            contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps="handled"
-        >
-            <TextInput
-                style={styles.inputCode}
-                placeholderTextColor="#ffffffaa"
-                multiline
-                value={code}
-                onChangeText={setCode}
-                autoCapitalize="none"
-                autoCorrect={false}
-                spellCheck={false}
-                onSelectionChange={({ nativeEvent }) => setSelection(nativeEvent.selection)}
-                onKeyPress={handleKeyPress}
-                selection={selection}
-                accessibilityLabel="Editor de código. Digite seu código aqui."
-                accessibilityRole="text"
-                accessible
-            />
-        </ScrollView>
+        <TextInput
+            style={[styles.inputCode, styles.scrollView]}
+            placeholderTextColor="#ffffffaa"
+            multiline
+            value={code}
+            onChangeText={setCode}
+            autoCapitalize="none"
+            autoCorrect={false}
+            spellCheck={false}
+            onSelectionChange={({ nativeEvent }) => setSelection(nativeEvent.selection)}
+            onKeyPress={handleKeyPress}
+            selection={selection}
+            accessibilityLabel="Editor de código. Digite seu código aqui."
+            accessibilityRole="text"
+            accessible
+        />
     );
 }

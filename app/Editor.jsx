@@ -1,27 +1,36 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
+import React, {
+    useRef,
+    useState,
+    useEffect,
+    useContext
+} from 'react';
+
 import
 {
     View,
-    TouchableOpacity,
     Text,
-    FlatList,
-    ScrollView,
+    Modal,
     Keyboard,
-    TextInput,
-    ActivityIndicator,
-    Modal
+    TouchableOpacity,
 } from 'react-native';
+
+import
+{
+    Redirect,
+    useRouter,
+} from 'expo-router';
+
 import { LinearGradient } from 'expo-linear-gradient';
-import { createStyles } from '../css/editor_css';
+import { useNavigationState } from '@react-navigation/native';
+
 import Header from '../components/Header';
 import Console from '../components/Console';
 import CodeEditor from '../components/CodeEditor';
 import ExerciseInstructions from '../components/ExerciseInstructions';
-import { API_URL, API_KEY } from '../constants/API_constants';
-import { AuthContext } from '../contexts/AuthContext';
-import { useRouter, useRootNavigationState, Redirect } from 'expo-router';
+
 import { apiRequest } from '../utils/api';
-import { useNavigationState } from '@react-navigation/native';
+import { createStyles } from '../css/editor_css';
+import { AuthContext } from '../contexts/AuthContext';
 
 export default function Editor()
 {
@@ -29,28 +38,99 @@ export default function Editor()
     const styles = createStyles(headerHeight);
     const consoleScrollViewRef = useRef(null);
 
-    const [selection, setSelection] = useState({ start: 0, end: 0 });
+    // State variables
     const [code, setCode] = useState('// Digite seu código abaixo');
+    const [showAccessibilityModal, setShowAccessibilityModal] = useState(false);
+    const [selection, setSelection] = useState({ start: 0, end: 0 });
+    const [showUnsavedModal, setShowUnsavedModal] = useState(false);
     const [currentExercise, setCurrentExercise] = useState(0);
+    const [pendingAction, setPendingAction] = useState(null);
+    const [consoleOutput, setConsoleOutput] = useState('');
     const [showConsole, setShowConsole] = useState(false);
     const [executing, setExecuting] = useState(false);
-    const [consoleOutput, setConsoleOutput] = useState('');
-
-    const routeName = useNavigationState(state =>
-        state.routes[state.index]?.name
-    );
-
+    const [modalError, setModalError] = useState('');
     const [exercises, setExercises] = useState([]);
-    const { userToken } = useContext(AuthContext); // Get token from AuthContext
-    const router = useRouter();
+    const [theme, setTheme] = useState('default');
 
-    if (!userToken)
+    const router = useRouter();
+    const routeName = useNavigationState(state => state.routes[state.index]?.name);
+
+    const { userToken } = useContext(AuthContext);
+    const { logout } = useContext(AuthContext);
+
+    useEffect(() =>
     {
-        return <Redirect href="/" />;
-    }
+        async function fetchExercises()
+        {
+            try
+            {
+                const jsonData = await apiRequest({
+                    method: 'GET',
+                    userToken
+                });
+
+                if (jsonData.status === 'success' && Array.isArray(jsonData.exercises))
+                {
+                    setExercises(jsonData.exercises.map(ex => ({
+                        id: ex.id,
+                        title: ex.title,
+                        code: ex.code || '',
+                        done: Boolean(ex.done == 1),
+                        testFileName: ex.testFileName || '',
+                        instruction: ex.instructions || ex.instruction || '',
+                    })));
+                } else
+                {
+                    setExercises([]);
+                    setConsoleOutput(`Erro ao carregar exercícios: ${jsonData.message || 'Resposta inesperada do servidor.'}`);
+                    setShowConsole(true);
+                }
+            } catch (error)
+            {
+                if (error.message && error.message.toLowerCase().includes('network'))
+                {
+                    setConsoleOutput('Erro de rede: Não foi possível carregar os exercícios. Verifique sua conexão com a internet.');
+                } else
+                {
+                    setConsoleOutput(`Erro inesperado ao carregar exercícios: ${error.message || error}`);
+                }
+                setShowConsole(true);
+                setExercises([]);
+            }
+        };
+        fetchExercises();
+    }, [userToken]);
+
+    useEffect(() =>
+    {
+        // When currentExercise changes, update code editor with the code for the selected exercise
+        if (exercises.length > 0 && exercises[currentExercise])
+        {
+            setCode(exercises[currentExercise].code || '');
+        }
+    }, [currentExercise, exercises]);
+
+    // Intercept navigation away (browser/tab close)
+    useEffect(() =>
+    {
+        function beforeUnload(e)
+        {
+            if (hasUnsavedChanges())
+            {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+        };
+
+        window.addEventListener('beforeunload', beforeUnload);
+        return () => window.removeEventListener('beforeunload', beforeUnload);
+    }, [code, exercises, currentExercise]);
+
+    if (!userToken) return <Redirect href="/" />;
 
     // Helper to update exercise status
-    const updateExerciseStatus = (done) =>
+    function updateExerciseStatus(done)
     {
         setExercises(prev =>
         {
@@ -61,7 +141,7 @@ export default function Editor()
     };
 
     // Helper to handle unauthorized
-    const handleUnauthorized = (response) =>
+    function handleUnauthorized(response)
     {
         if (response.status === 401)
         {
@@ -71,7 +151,7 @@ export default function Editor()
         return false;
     };
 
-    const handleRunCode = async () =>
+    async function handleRunCode()
     {
         if (!code || code.trim() === '')
         {
@@ -79,17 +159,21 @@ export default function Editor()
             setConsoleOutput('Por favor, escreva algum código antes de executar.');
             return;
         }
+
         setExercises(prev =>
         {
             const updated = [...prev];
             if (updated[currentExercise]) updated[currentExercise].code = code;
             return updated;
         });
+
         if (executing) return;
+
+        Keyboard.dismiss();
         setExecuting(true);
         setShowConsole(true);
         setConsoleOutput("Executando...");
-        Keyboard.dismiss();
+
         try
         {
             const jsonData = await apiRequest({
@@ -101,14 +185,17 @@ export default function Editor()
                 },
                 userToken
             });
+
             if (jsonData.status !== 'success')
             {
                 setConsoleOutput(`Erro do servidor: ${jsonData.message || 'Resposta inesperada do servidor.'}`);
                 updateExerciseStatus(false);
                 return;
             }
+
             const testsData = JSON.parse(jsonData.message);
             const failures = parseInt(testsData.failures || "0");
+
             if (failures === 0)
             {
                 setConsoleOutput("Execução feita com sucesso: Vá para o próximo exercício");
@@ -142,70 +229,14 @@ export default function Editor()
         }
     };
 
-    useEffect(() =>
-    {
-        const fetchExercises = async () =>
-        {
-
-            try
-            {
-                const jsonData = await apiRequest({
-                    method: 'GET',
-                    userToken
-                });
-                if (jsonData.status === 'success' && Array.isArray(jsonData.exercises))
-                {
-                    setExercises(jsonData.exercises.map(ex => ({
-                        id: ex.id,
-                        title: ex.title,
-                        instruction: ex.instructions || ex.instruction || '',
-                        done: Boolean(ex.done == 1),
-                        testFileName: ex.testFileName || '',
-                        code: ex.code || ''
-                    })));
-                } else
-                {
-                    setExercises([]);
-                    setConsoleOutput(`Erro ao carregar exercícios: ${jsonData.message || 'Resposta inesperada do servidor.'}`);
-                    setShowConsole(true);
-                }
-            } catch (error)
-            {
-                if (error.message && error.message.toLowerCase().includes('network'))
-                {
-                    setConsoleOutput('Erro de rede: Não foi possível carregar os exercícios. Verifique sua conexão com a internet.');
-                } else
-                {
-                    setConsoleOutput(`Erro inesperado ao carregar exercícios: ${error.message || error}`);
-                }
-                setShowConsole(true);
-                setExercises([]);
-            }
-        };
-        fetchExercises();
-    }, [userToken]);
-
-    useEffect(() =>
-    {
-        // When currentExercise changes, update code editor with the code for the selected exercise
-        if (exercises.length > 0 && exercises[currentExercise])
-        {
-            setCode(exercises[currentExercise].code || '');
-        }
-    }, [currentExercise, exercises]);
-
-    const [showUnsavedModal, setShowUnsavedModal] = useState(false);
-    const [pendingAction, setPendingAction] = useState(null); // { type: 'switch'|'logout'|'navigate', value: any }
-    const [modalError, setModalError] = useState('');
-
     // Helper to check for unsaved changes
-    const hasUnsavedChanges = () =>
+    function hasUnsavedChanges()
     {
         return exercises.length > 0 && exercises[currentExercise] && code !== exercises[currentExercise].code;
     };
 
     // Intercept exercise switch
-    const requestExerciseSwitch = (index) =>
+    function requestExerciseSwitch(index)
     {
         if (index === currentExercise) return;
         if (hasUnsavedChanges())
@@ -222,7 +253,7 @@ export default function Editor()
     };
 
     // Intercept logout
-    const requestLogout = () =>
+    function requestLogout()
     {
         if (hasUnsavedChanges())
         {
@@ -234,32 +265,15 @@ export default function Editor()
         }
     };
 
-    // Intercept navigation away (browser/tab close)
-    useEffect(() =>
-    {
-        const beforeUnload = (e) =>
-        {
-            if (hasUnsavedChanges())
-            {
-                e.preventDefault();
-                e.returnValue = '';
-                return '';
-            }
-        };
-        window.addEventListener('beforeunload', beforeUnload);
-        return () => window.removeEventListener('beforeunload', beforeUnload);
-    }, [code, exercises, currentExercise]);
-
-    // Actual logout
-    const { logout } = useContext(AuthContext);
-    const doLogout = async () =>
+    // Handle logout
+    async function doLogout()
     {
         await logout();
         router.replace('/');
     };
 
     // Handle modal actions
-    const handleModalAction = async (action) =>
+    async function handleModalAction(action)
     {
         setModalError('');
         setShowUnsavedModal(false);
@@ -308,11 +322,8 @@ export default function Editor()
         }
     };
 
-    const [theme, setTheme] = useState('default'); // 'default' | 'high-contrast' | 'light' | 'dark'
-    const [showAccessibilityModal, setShowAccessibilityModal] = useState(false);
-
     // Theme styles
-    const getThemeColors = () =>
+    function getThemeColors()
     {
         if (theme === 'high-contrast')
         {
@@ -326,6 +337,7 @@ export default function Editor()
         }
         return ['#FF6B6B', '#FF8E53', '#FFAF40']; // default
     };
+
     const themeColors = getThemeColors();
 
     return (
@@ -337,15 +349,15 @@ export default function Editor()
         >
             <Header
                 styles={styles}
-                headerHeight={headerHeight}
-                handleRunCode={handleRunCode}
                 executing={executing}
                 exercises={exercises}
-                setCurrentExercise={requestExerciseSwitch}
+                headerHeight={headerHeight}
                 currentExercise={currentExercise}
-                setShowConsole={setShowConsole}
                 setCode={setCode}
+                handleRunCode={handleRunCode}
                 requestLogout={requestLogout}
+                setShowConsole={setShowConsole}
+                setCurrentExercise={requestExerciseSwitch}
                 onOpenAccessibility={() => setShowAccessibilityModal(true)}
             />
 
@@ -359,8 +371,8 @@ export default function Editor()
 
             <Console
                 styles={styles}
-                consoleOutput={consoleOutput}
                 showConsole={showConsole}
+                consoleOutput={consoleOutput}
             />
 
             <ExerciseInstructions
@@ -369,7 +381,7 @@ export default function Editor()
             />
             {exercises.length === 0 && (
                 <View style={{ padding: 20, alignItems: 'center' }}>
-                    <Text style={{ color: '#fff', fontSize: 18, textAlign: 'center' }}>
+                    <Text style={{ color: '#ddd', fontSize: 18, textAlign: 'center' }}>
                         Nenhum exercício disponível no momento. Tente novamente mais tarde ou contate o suporte.
                     </Text>
                 </View>

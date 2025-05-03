@@ -79,7 +79,6 @@ export function createStyles()
             shadowRadius: 5,
             elevation: 5,
         },
-
         passwordContainer:
             Platform.select({
                 ios: {
@@ -91,17 +90,17 @@ export function createStyles()
                     left: 15,
                 },
             }),
-
-        passwordEye: Platform.select({
-            ios: {
-            },
-            android: {
-            },
-            web: {
-                position: 'relative',
-                left: -25,
-            },
-        }),
+        passwordEye:
+            Platform.select({
+                ios: {
+                },
+                android: {
+                },
+                web: {
+                    position: 'relative',
+                    left: -25,
+                },
+            }),
 
         password: {
             width: '80%',
