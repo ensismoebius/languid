@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Platform, View, StyleSheet } from 'react-native';
 import { MONACO_URL } from '../constants/API_constants';
 
-export default function MonacoEditorView({ style, initialCode = '', onCodeChange })
+export default function MonacoEditorView({ style, code = '', setCode })
 {
     const iframeRef = useRef(null);
 
@@ -10,44 +10,50 @@ export default function MonacoEditorView({ style, initialCode = '', onCodeChange
     useEffect(() =>
     {
         if (Platform.OS !== 'web') return;
-        
+
         const iframe = iframeRef.current;
         if (!iframe || !iframe.contentWindow) return;
 
         // Send initial code after iframe is ready
-        const sendCode = () =>
+        function sendCode()
         {
             iframe.contentWindow.postMessage(
-                JSON.stringify({ type: 'setCode', code: initialCode }),
+                JSON.stringify(
+                    {
+                        type: 'setCode',
+                        code: code
+                    }
+                ),
                 '*'
             );
         };
 
         // Wait briefly to ensure iframe is loaded
-        const timeout = setTimeout(sendCode, 500);
+        const timeout = setTimeout(sendCode, 250);
         return () => clearTimeout(timeout);
-    }, [initialCode]);
+    }, [code]);
 
     // RECEIVE CODE CHANGES FROM iframe
     useEffect(() =>
     {
         if (Platform.OS !== 'web') return;
 
-        const handleMessage = (event) =>
+        function handleMessage(event)
         {
             try
             {
                 const msg = JSON.parse(event.data);
+
                 if (msg.type === 'codeChange' && typeof msg.code === 'string')
                 {
-                    onCodeChange?.(msg.code);
+                    setCode?.(msg.code);
                 }
             } catch { }
         };
 
         window.addEventListener('message', handleMessage);
         return () => window.removeEventListener('message', handleMessage);
-    }, [onCodeChange]);
+    }, [setCode]);
 
     if (Platform.OS !== 'web') return null;
 

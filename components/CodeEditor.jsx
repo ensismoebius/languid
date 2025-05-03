@@ -23,9 +23,11 @@ export default function CodeEditor({ styles, code, setCode, selection, setSelect
     {
         return (
             <MonacoEditorView
-                style={[styles.inputCode, styles.scrollView]}
-                onCodeChange={setCode}
-                initialCode={code}
+                style={
+                    [styles.inputCode, styles.scrollView]
+                }
+                setCode={setCode}
+                code={code}
             />
         );
     } else
