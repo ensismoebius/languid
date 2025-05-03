@@ -88,9 +88,20 @@ export function createStyles()
                 },
                 web: {
                     position: 'relative',
-                    left: 12,
+                    left: 15,
                 },
             }),
+
+        passwordEye: Platform.select({
+            ios: {
+            },
+            android: {
+            },
+            web: {
+                position: 'relative',
+                left: -25,
+            },
+        }),
 
         password: {
             width: '80%',

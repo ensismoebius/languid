@@ -75,7 +75,7 @@ export default function LoginScreen()
             accessibilityRole="button"
             accessible
           >
-            <Icon name={hidden ? "eye-off" : "eye"} size={20} />
+            <Icon name={hidden ? "eye-off" : "eye"} size={20} style={styles.passwordEye} />
           </TouchableOpacity>
         </View>
 
