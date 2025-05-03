@@ -1,8 +1,15 @@
 import React from 'react';
-import { ScrollView, TextInput } from 'react-native';
+import Editor from "@monaco-editor/react";
+import { Platform, ScrollView, TextInput, View } from 'react-native';
 
 export default function CodeEditor({ styles, code, setCode, selection, setSelection })
 {
+    const handleEditorDidMount = (editor, monaco) =>
+    {
+        // Revela a primeira linha após a montagem do editor
+        editor.revealLine(1);
+    };
+
     const handleKeyPress = ({ nativeEvent }) =>
     {
         if (nativeEvent.key === 'Tab')
@@ -17,23 +24,43 @@ export default function CodeEditor({ styles, code, setCode, selection, setSelect
             setSelection({ start: newCursorPos, end: newCursorPos });
         }
     };
-
-    return (
-        <TextInput
-            style={[styles.inputCode, styles.scrollView]}
-            placeholderTextColor="#ffffffaa"
-            multiline
-            value={code}
-            onChangeText={setCode}
-            autoCapitalize="none"
-            autoCorrect={false}
-            spellCheck={false}
-            onSelectionChange={({ nativeEvent }) => setSelection(nativeEvent.selection)}
-            onKeyPress={handleKeyPress}
-            selection={selection}
-            accessibilityLabel="Editor de código. Digite seu código aqui."
-            accessibilityRole="text"
-            accessible
-        />
-    );
+    if (Platform.OS === 'web')
+    {
+        return (
+            <View style={[styles.scrollView]}>
+                <Editor
+                    defaultLanguage="cpp"
+                    value={code}
+                    onChange={setCode}
+                    theme="vs-dark"
+                    options={{
+                        fontSize: 20,
+                        wordWrap: 'on',
+                        minimap: { enabled: true },
+                        automaticLayout: true,
+                    }}
+                />
+            </View>
+        );
+    } else
+    {
+        return (
+            <TextInput
+                style={[styles.inputCode, styles.scrollView]}
+                placeholderTextColor="#ffffffaa"
+                multiline
+                value={code}
+                onChangeText={setCode}
+                autoCapitalize="none"
+                autoCorrect={false}
+                spellCheck={false}
+                onSelectionChange={({ nativeEvent }) => setSelection(nativeEvent.selection)}
+                onKeyPress={handleKeyPress}
+                selection={selection}
+                accessibilityLabel="Editor de código. Digite seu código aqui."
+                accessibilityRole="text"
+                accessible
+            />
+        );
+    }
 }
