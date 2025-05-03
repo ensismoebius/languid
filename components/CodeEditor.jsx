@@ -1,5 +1,6 @@
 import React from 'react';
-import { ScrollView, TextInput } from 'react-native';
+import { Button, Platform, ScrollView, Text, TextInput, View } from 'react-native';
+import MonacoEditorView from './MonacoEditorView';
 
 export default function CodeEditor({ styles, code, setCode, selection, setSelection })
 {
@@ -18,22 +19,34 @@ export default function CodeEditor({ styles, code, setCode, selection, setSelect
         }
     };
 
-    return (
-        <TextInput
-            style={[styles.inputCode, styles.scrollView]}
-            placeholderTextColor="#ffffffaa"
-            multiline
-            value={code}
-            onChangeText={setCode}
-            autoCapitalize="none"
-            autoCorrect={false}
-            spellCheck={false}
-            onSelectionChange={({ nativeEvent }) => setSelection(nativeEvent.selection)}
-            onKeyPress={handleKeyPress}
-            selection={selection}
-            accessibilityLabel="Editor de código. Digite seu código aqui."
-            accessibilityRole="text"
-            accessible
-        />
-    );
+    if (Platform.OS === 'web')
+    {
+        return (
+            <MonacoEditorView
+                style={[styles.inputCode, styles.scrollView]}
+                onCodeChange={setCode}
+                initialCode={code}
+            />
+        );
+    } else
+    {
+        return (
+            <TextInput
+                style={[styles.inputCode, styles.scrollView]}
+                placeholderTextColor="#ffffffaa"
+                multiline
+                value={code}
+                onChangeText={setCode}
+                autoCapitalize="none"
+                autoCorrect={false}
+                spellCheck={false}
+                onSelectionChange={({ nativeEvent }) => setSelection(nativeEvent.selection)}
+                onKeyPress={handleKeyPress}
+                selection={selection}
+                accessibilityLabel="Editor de código. Digite seu código aqui."
+                accessibilityRole="text"
+                accessible
+            />
+        );
+    }
 }
