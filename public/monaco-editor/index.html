@@ -57,7 +57,7 @@
                     try
                     {
                         const msg = JSON.parse(event.data);
-                        if (msg.type === 'setCode' && msg.code)
+                        if (msg.type === 'setCode')
                         {
                             editor.setValue(msg.code);
                         }

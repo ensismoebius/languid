@@ -1,8 +1,16 @@
 import React from 'react';
-import { Button, Platform, ScrollView, Text, TextInput, View } from 'react-native';
 import MonacoEditorView from './MonacoEditorView';
+import { Platform, TextInput } from 'react-native';
 
-export default function CodeEditor({ styles, code, setCode, selection, setSelection })
+export default function CodeEditor(
+    {
+        styles,
+        code,
+        setCode,
+        selection,
+        setSelection
+    }
+)
 {
     const handleKeyPress = ({ nativeEvent }) =>
     {
@@ -30,7 +38,8 @@ export default function CodeEditor({ styles, code, setCode, selection, setSelect
                 code={code}
             />
         );
-    } else
+    }
+    else
     {
         return (
             <TextInput

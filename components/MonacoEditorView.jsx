@@ -2,7 +2,9 @@ import React, { useEffect, useRef } from 'react';
 import { Platform, View, StyleSheet } from 'react-native';
 import { MONACO_URL } from '../constants/API_constants';
 
-export default function MonacoEditorView({ style, code = '', setCode })
+export default function MonacoEditorView(
+    { style, code = '', setCode }
+)
 {
     const iframeRef = useRef(null);
 
