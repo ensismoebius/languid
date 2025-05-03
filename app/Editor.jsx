@@ -110,23 +110,6 @@ export default function Editor()
         }
     }, [currentExercise, exercises]);
 
-    // Intercept navigation away (browser/tab close)
-    useEffect(() =>
-    {
-        function beforeUnload(e)
-        {
-            if (hasUnsavedChanges())
-            {
-                e.preventDefault();
-                e.returnValue = '';
-                return '';
-            }
-        };
-
-        window.addEventListener('beforeunload', beforeUnload);
-        return () => window.removeEventListener('beforeunload', beforeUnload);
-    }, [code, exercises, currentExercise]);
-
     if (!userToken) return <Redirect href="/" />;
 
     // Helper to update exercise status
@@ -401,7 +384,7 @@ export default function Editor()
                         {modalError ? (
                             <Text style={{ color: '#f44336', marginBottom: 10 }}>{modalError}</Text>
                         ) : null}
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <View style={{ flexDirection: 'column', justifyContent: 'space-between' }}>
                             <TouchableOpacity onPress={() => handleModalAction('save')} style={{ padding: 10 }} accessibilityLabel="Salvar e continuar" accessibilityRole="button">
                                 <Text style={{ color: '#2196F3', fontWeight: 'bold' }}>Salvar e continuar</Text>
                             </TouchableOpacity>
