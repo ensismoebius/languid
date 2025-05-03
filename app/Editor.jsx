@@ -19,8 +19,9 @@ import CodeEditor from '../components/CodeEditor';
 import ExerciseInstructions from '../components/ExerciseInstructions';
 import { API_URL, API_KEY } from '../constants/API_constants';
 import { AuthContext } from '../contexts/AuthContext';
-import { useRouter, useRootNavigationState } from 'expo-router';
+import { useRouter, useRootNavigationState, Redirect } from 'expo-router';
 import { apiRequest } from '../utils/api';
+import { useNavigationState } from '@react-navigation/native';
 
 export default function Editor()
 {
@@ -35,10 +36,18 @@ export default function Editor()
     const [executing, setExecuting] = useState(false);
     const [consoleOutput, setConsoleOutput] = useState('');
 
+    const routeName = useNavigationState(state =>
+        state.routes[state.index]?.name
+    );
+
     const [exercises, setExercises] = useState([]);
     const { userToken } = useContext(AuthContext); // Get token from AuthContext
     const router = useRouter();
-    const navigationState = useRootNavigationState();
+
+    if (!userToken)
+    {
+        return <Redirect href="/" />;
+    }
 
     // Helper to update exercise status
     const updateExerciseStatus = (done) =>
@@ -137,6 +146,7 @@ export default function Editor()
     {
         const fetchExercises = async () =>
         {
+
             try
             {
                 const jsonData = await apiRequest({
@@ -174,15 +184,6 @@ export default function Editor()
         };
         fetchExercises();
     }, [userToken]);
-
-    useEffect(() =>
-    {
-        // Redirect to login if not authenticated, but only after navigation is ready
-        if (navigationState?.key && !userToken)
-        {
-            router.replace('/');
-        }
-    }, [userToken, navigationState]);
 
     useEffect(() =>
     {

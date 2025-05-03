@@ -1,7 +1,8 @@
 import React, { createContext, useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { API_URL, API_KEY } from '../constants/API_constants';
-import md5 from 'md5';
+import MD5 from 'crypto-js/md5';
+
 import { Platform } from 'react-native';
 import { apiRequest } from '../utils/api';
 
@@ -50,7 +51,7 @@ export const AuthProvider = ({ children }) =>
     {
         try
         {
-            const hashedPassword = md5(password);
+            const hashedPassword = MD5(password).toString();
             const jsonData = await apiRequest({
                 method: "POST",
                 body: {
