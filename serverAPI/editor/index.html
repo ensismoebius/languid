@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise Editor</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            color: #e4e4e4;
+            background-color: #1e1e1e;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: #252526;
+            color: #61dafb;
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            background-color: #252526;
+        }
+
+        .exercise-list {
+            margin-bottom: 20px;
+            list-style: none;
+            padding: 0;
+        }
+
+        .exercise-list li {
+            padding: 12px 15px;
+            border-bottom: 1px solid #333;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .exercise-list li:hover {
+            background-color: #2a2d2e;
+        }
+
+        .exercise-form {
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            background-color: #252526;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #61dafb;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: #1e1e1e;
+            color: #e4e4e4;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #61dafb;
+            box-shadow: 0 0 5px rgba(97, 218, 251, 0.5);
+        }
+
+        textarea {
+            min-height: 200px;
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+
+        .code-editor {
+            min-height: 400px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            background-color: #0e639c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #1177bb;
+        }
+
+        .btn-danger {
+            background-color: #e51400;
+        }
+
+        .btn-danger:hover {
+            background-color: #f71700;
+        }
+
+        .btn-success {
+            background-color: #107c10;
+        }
+
+        .btn-success:hover {
+            background-color: #13a313;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error {
+            color: #f48771;
+            margin-top: 10px;
+        }
+
+        .success {
+            color: #89d185;
+            margin-top: 10px;
+        }
+
+        .action-buttons {
+            margin-top: 20px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #61dafb;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+    </style>
+    <script src="crypto-js.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>Exercise Editor</h1>
+    </header>
+
+    <div class="container">
+        <!-- Login Section -->
+        <div id="login-section" class="login-container">
+            <h2>Login</h2>
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password">
+            </div>
+            <button id="login-btn" class="btn">Login</button>
+            <p id="login-error" class="error hidden"></p>
+        </div>
+
+        <!-- Main Editor Section -->
+        <div id="editor-section" class="hidden">
+            <div class="nav-buttons">
+                <button id="list-exercises-btn" class="btn">List Exercises</button>
+                <button id="new-exercise-btn" class="btn btn-success">New Exercise</button>
+                <button id="logout-btn" class="btn btn-danger">Logout</button>
+            </div>
+
+            <!-- Exercise List -->
+            <div id="exercise-list-container">
+                <h2>Exercises</h2>
+                <ul id="exercise-list" class="exercise-list"></ul>
+            </div>
+
+            <!-- Exercise Form -->
+            <div id="exercise-form-container" class="exercise-form hidden">
+                <h2 id="form-title">Edit Exercise</h2>
+                <input type="hidden" id="exercise-id">
+                <div class="form-group">
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" name="title">
+                </div>
+                <div class="form-group">
+                    <label for="instructions">Instructions:</label>
+                    <textarea id="instructions" name="instructions"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="test-file">Test File (C++):</label>
+                    <textarea id="test-file" name="test-file" class="code-editor"></textarea>
+                </div>
+                <div class="action-buttons">
+                    <button id="save-btn" class="btn btn-success">Save</button>
+                    <button id="cancel-btn" class="btn">Cancel</button>
+                    <button id="delete-btn" class="btn btn-danger hidden">Delete</button>
+                </div>
+                <p id="form-message" class="hidden"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let token = localStorage.getItem('auth_token');
+        const API_KEY = 're98wr6ew8r6rew76r89e6rwer6w98r6ywe9r6r6w87e9wr6ew06r7'; // Same API key as in APIExercisesHandler.php
+
+        // DOM Elements
+        const loginSection = document.getElementById('login-section');
+        const editorSection = document.getElementById('editor-section');
+        const exerciseListContainer = document.getElementById('exercise-list-container');
+        const exerciseFormContainer = document.getElementById('exercise-form-container');
+        const exerciseList = document.getElementById('exercise-list');
+        const formTitle = document.getElementById('form-title');
+        const exerciseIdInput = document.getElementById('exercise-id');
+        const titleInput = document.getElementById('title');
+        const instructionsInput = document.getElementById('instructions');
+        const testFileInput = document.getElementById('test-file');
+        const saveBtn = document.getElementById('save-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const deleteBtn = document.getElementById('delete-btn');
+        const formMessage = document.getElementById('form-message');
+        const loginBtn = document.getElementById('login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const loginError = document.getElementById('login-error');
+        const listExercisesBtn = document.getElementById('list-exercises-btn');
+        const newExerciseBtn = document.getElementById('new-exercise-btn');
+
+        // Check if user is logged in
+        function checkAuth()
+        {
+            if (token)
+            {
+                loginSection.classList.add('hidden');
+                editorSection.classList.remove('hidden');
+                fetchExercises();
+            } else
+            {
+                loginSection.classList.remove('hidden');
+                editorSection.classList.add('hidden');
+            }
+        }
+
+        // Login function
+        async function login()
+        {
+            const username = document.getElementById('username').value;
+            let password = document.getElementById('password').value;
+            password = CryptoJS.MD5(password).toString();
+
+            if (!username || !password)
+            {
+                showLoginError('Please enter username and password');
+                return;
+            }
+
+            try
+            {
+                const response = await fetch('../APIExercisesHandler.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-KEY': API_KEY
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success')
+                {
+                    token = data.token;
+                    localStorage.setItem('auth_token', token);
+                    checkAuth();
+                } else
+                {
+                    showLoginError(data.message || 'Login failed');
+                }
+            } catch (error)
+            {
+                showLoginError('An error occurred during login');
+                console.error(error);
+            }
+        }
+
+        // Logout function
+        function logout()
+        {
+            token = null;
+            localStorage.removeItem('auth_token');
+            checkAuth();
+        }
+
+        // Show login error
+        function showLoginError(message)
+        {
+            loginError.textContent = message;
+            loginError.classList.remove('hidden');
+        }
+
+        // Fetch all exercises
+        async function fetchExercises()
+        {
+            try
+            {
+                const response = await fetch('editor.php', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-API-KEY': API_KEY
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success')
+                {
+                    displayExercises(data.exercises);
+                    exerciseListContainer.classList.remove('hidden');
+                    exerciseFormContainer.classList.add('hidden');
+                } else
+                {
+                    // Handle error
+                    console.error('Failed to fetch exercises:', data.message);
+                }
+            } catch (error)
+            {
+                console.error('Error fetching exercises:', error);
+            }
+        }
+
+        // Display exercises in the list
+        function displayExercises(exercises)
+        {
+            exerciseList.innerHTML = '';
+            exercises.forEach(exercise =>
+            {
+                const li = document.createElement('li');
+                li.textContent = `${exercise.id}. ${exercise.title}`;
+                li.dataset.id = exercise.id;
+                li.addEventListener('click', () => fetchExercise(exercise.id));
+                exerciseList.appendChild(li);
+            });
+        }
+
+        // Fetch a specific exercise
+        async function fetchExercise(id)
+        {
+            try
+            {
+                const response = await fetch(`editor.php/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-API-KEY': API_KEY
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success')
+                {
+                    displayExerciseForm(data.exercise);
+                } else
+                {
+                    // Handle error
+                    console.error('Failed to fetch exercise:', data.message);
+                }
+            } catch (error)
+            {
+                console.error('Error fetching exercise:', error);
+            }
+        }
+
+        // Display the exercise form with data
+        function displayExerciseForm(exercise = null)
+        {
+            exerciseListContainer.classList.add('hidden');
+            exerciseFormContainer.classList.remove('hidden');
+
+            if (exercise)
+            {
+                formTitle.textContent = 'Edit Exercise';
+                exerciseIdInput.value = exercise.id;
+                titleInput.value = exercise.title;
+                instructionsInput.value = exercise.instructions;
+                testFileInput.value = exercise.testFileContent;
+                deleteBtn.classList.remove('hidden');
+            } else
+            {
+                formTitle.textContent = 'New Exercise';
+                exerciseIdInput.value = '';
+                titleInput.value = '';
+                instructionsInput.value = '';
+                testFileInput.value = '';
+                deleteBtn.classList.add('hidden');
+            }
+
+            formMessage.classList.add('hidden');
+        }
+
+        // Save an exercise (create or update)
+        async function saveExercise()
+        {
+            const id = exerciseIdInput.value;
+            const title = titleInput.value;
+            const instructions = instructionsInput.value;
+            const testFileContent = testFileInput.value;
+
+            if (!title || !instructions || !testFileContent)
+            {
+                showFormMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            const isNewExercise = !id;
+            const url = isNewExercise ? 'editor.php' : `editor.php/${id}`;
+            const method = isNewExercise ? 'POST' : 'PUT';
+
+            try
+            {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'X-API-KEY': API_KEY
+                    },
+                    body: JSON.stringify({ title, instructions, testFileContent })
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success')
+                {
+                    showFormMessage(data.message, 'success');
+                    setTimeout(() => fetchExercises(), 1500);
+                } else
+                {
+                    showFormMessage(data.message || 'Failed to save exercise', 'error');
+                }
+            } catch (error)
+            {
+                showFormMessage('An error occurred while saving', 'error');
+                console.error(error);
+            }
+        }
+
+        // Delete an exercise
+        async function deleteExercise()
+        {
+            const id = exerciseIdInput.value;
+
+            if (!id)
+            {
+                return;
+            }
+
+            if (!confirm('Are you sure you want to delete this exercise?'))
+            {
+                return;
+            }
+
+            try
+            {
+                const response = await fetch(`editor.php/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-API-KEY': API_KEY
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success')
+                {
+                    showFormMessage(data.message, 'success');
+                    setTimeout(() => fetchExercises(), 1500);
+                } else
+                {
+                    showFormMessage(data.message || 'Failed to delete exercise', 'error');
+                }
+            } catch (error)
+            {
+                showFormMessage('An error occurred while deleting', 'error');
+                console.error(error);
+            }
+        }
+
+        // Show form message
+        function showFormMessage(message, type)
+        {
+            formMessage.textContent = message;
+            formMessage.className = type === 'error' ? 'error' : 'success';
+            formMessage.classList.remove('hidden');
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', checkAuth);
+        loginBtn.addEventListener('click', login);
+        logoutBtn.addEventListener('click', logout);
+        saveBtn.addEventListener('click', saveExercise);
+        cancelBtn.addEventListener('click', fetchExercises);
+        deleteBtn.addEventListener('click', deleteExercise);
+        listExercisesBtn.addEventListener('click', fetchExercises);
+        newExerciseBtn.addEventListener('click', () => displayExerciseForm());
+    </script>
+</body>
+
+</html>

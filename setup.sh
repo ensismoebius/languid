@@ -78,7 +78,8 @@ CREATE TABLE IF NOT EXISTS exercise (
 CREATE TABLE IF NOT EXISTS user (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
-    passwdHash VARCHAR(255) NOT NULL
+    passwdHash VARCHAR(255) NOT NULL,
+    admin BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS user_exercise (
@@ -102,7 +103,7 @@ rm create_database.sql
 cat <<EOL > insert_default_user.sql
 USE languid;
 
-INSERT INTO user (email, passwdHash) VALUES ('test', MD5('1234'));
+INSERT INTO user (email, passwdHash, admin) VALUES ('admin', MD5('1234'), 1);
 EOL
 
 # Execute the SQL script to insert the default user

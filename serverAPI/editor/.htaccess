@@ -1,0 +1,22 @@
+# Enable the rewrite engine
+RewriteEngine On
+
+# Handling HTTP methods
+RewriteCond %{REQUEST_METHOD} ^(GET|POST|PUT|DELETE|OPTIONS)
+RewriteRule ^([0-9]+)/?$ editor.php/$1 [L,QSA]
+
+# Set proper content type for JSON
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, X-API-KEY"
+</IfModule>
+
+# PHP settings
+<IfModule mod_php7.c>
+    php_flag display_errors on
+    php_value error_reporting E_ALL
+</IfModule>
+
+# Security settings
+Options -Indexes
