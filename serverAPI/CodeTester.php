@@ -22,7 +22,8 @@ class CodeTester
         $tempExecutableName = uniqid();
 
         $uploadPath = UPLOADS_DIR . $tempCppFileName;
-        file_put_contents($uploadPath, $this->code);
+        // file_put_contents($uploadPath, $this->code);
+        file_put_contents($uploadPath, mb_convert_encoding($this->code, 'UTF-8'));
 
         $testFile = EXERCISE_DIR . $this->exercise;
         $execPath = BIN_DIR . $tempExecutableName;
@@ -37,7 +38,7 @@ class CodeTester
 
         $containerName = "sandbox" . uniqid();
 
-        $dockerCmd = "docker run --rm --name $containerName -v $uploadPath:/tmp/code.cpp:ro -v $testFile:/tmp/test.cpp:ro sandbox bash -c 'g++ -std=c++20 /tmp/code.cpp -o /tmp/code_exec && g++ -std=c++20 /tmp/test.cpp -o /tmp/test_exec -lgtest -lgtest_main -pthread && /tmp/test_exec --gtest_output=json:res.json > /dev/null 2>&1; cat res.json'";
+        $dockerCmd = "docker run --rm --name $containerName -v $uploadPath:/tmp/code.cpp:ro -v $testFile:/tmp/test.cpp:ro sandbox bash -c 'export LANG=en_US.UTF-8; g++ -std=c++20 /tmp/code.cpp -o /tmp/code_exec && g++ -std=c++20 /tmp/test.cpp -o /tmp/test_exec -lgtest -lgtest_main -pthread && /tmp/test_exec --gtest_output=json:res.json > /dev/null 2>&1; cat res.json'";
 
         $temp = "docker run -it --rm --name $containerName -v $uploadPath:/tmp/code.cpp:ro -v $testFile:/tmp/test.cpp:ro sandbox bash";
 

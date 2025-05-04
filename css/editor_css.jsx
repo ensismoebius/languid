@@ -3,6 +3,13 @@ import { Dimensions, Platform, StyleSheet } from "react-native";
 export function createStyles(headerHeight)
 {
     return StyleSheet.create({
+        editorContainer: {
+            position: 'relative',
+            top: 0,
+            minHeight: Dimensions.get('window').height * 0.7 - 100,
+            marginBottom: 1,
+            borderWidth: 0,
+        },
         container: {
             flex: 1,
             padding: 5,
@@ -82,16 +89,14 @@ export function createStyles(headerHeight)
             paddingBottom: 20,
         },
         inputCode: {
-            padding: 15,
             fontSize: 16,
             lineHeight: 24,
-            borderWidth: 1,
             borderRadius: 10,
             color: 'white',
             borderColor: '#ffffff30',
             textAlignVertical: 'top',
             backgroundColor: '#1e1e1e',
-            minHeight: Dimensions.get('window').height * 0.5 - 100,
+            minHeight: Dimensions.get('window').height * 0.3 - 100,
             fontFamily: Platform.select({ ios: 'Courier', android: 'monospace' }),
         },
         instructions: {

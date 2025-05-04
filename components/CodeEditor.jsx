@@ -1,9 +1,15 @@
 import React from 'react';
-import { Button, Platform, ScrollView, Text, TextInput, View } from 'react-native';
-import MonacoEditorView from './MonacoEditorView';
+import Editor from "@monaco-editor/react";
+import { Platform, ScrollView, TextInput, View } from 'react-native';
 
 export default function CodeEditor({ styles, code, setCode, selection, setSelection })
 {
+    const handleEditorDidMount = (editor, monaco) =>
+    {
+        // Revela a primeira linha após a montagem do editor
+        editor.revealLine(1);
+    };
+
     const handleKeyPress = ({ nativeEvent }) =>
     {
         if (nativeEvent.key === 'Tab')
@@ -18,15 +24,23 @@ export default function CodeEditor({ styles, code, setCode, selection, setSelect
             setSelection({ start: newCursorPos, end: newCursorPos });
         }
     };
-
     if (Platform.OS === 'web')
     {
         return (
-            <MonacoEditorView
-                style={[styles.inputCode, styles.scrollView]}
-                onCodeChange={setCode}
-                initialCode={code}
-            />
+            <View style={[styles.scrollView]}>
+                <Editor
+                    defaultLanguage="cpp"
+                    value={code}
+                    onChange={setCode}
+                    theme="vs-dark"
+                    options={{
+                        fontSize: 20,
+                        wordWrap: 'on',
+                        minimap: { enabled: true },
+                        automaticLayout: true,
+                    }}
+                />
+            </View>
         );
     } else
     {

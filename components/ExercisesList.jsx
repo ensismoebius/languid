@@ -1,11 +1,33 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { FlatList, TouchableOpacity, Text, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function ExercisesList({ styles, exercises, currentExercise, handleExerciseSelect })
 {
+    const flatListRef = useRef(null);
+
+    useEffect(() =>
+    {
+        if (flatListRef.current && currentExercise != null)
+        {
+            if (currentExercise > exercises.length - 1)
+            {
+                return;
+            }
+            // Scroll to the current exercise index
+            // Isso garante que o FlatList seja rolado para o exercício atual
+            // e o item fique centralizado na tela
+            flatListRef.current.scrollToIndex({
+                index: currentExercise,
+                animated: true,
+                viewPosition: 0, // centraliza o item na tela
+            });
+        }
+    }, [currentExercise]);
+
     return (
         <FlatList
+            ref={flatListRef}
             data={exercises}
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -30,6 +52,11 @@ export default function ExercisesList({ styles, exercises, currentExercise, hand
             )}
             keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={styles.flatListContent}
+            getItemLayout={(_, index) => ({
+                length: styles.exerciseItem?.width || 100, // ajuste conforme largura real do item
+                offset: (styles.exerciseItem?.width || 100) * index,
+                index,
+            })}
         />
     );
 }

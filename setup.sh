@@ -26,17 +26,30 @@ else
   touch Dockerfile
   cat <<EOL > Dockerfile
 FROM ubuntu:latest
-RUN apt-get update && apt-get install -y g++ cmake libgtest-dev && \
+RUN apt-get update && apt-get install -y g++ cmake libgtest-dev locales && \
+    locale-gen pt_BR.UTF-8 && \
+    update-locale LANG=pt_BR.UTF-8 LANGUAGE=pt_BR.UTF-8 LC_ALL=pt_BR.UTF-8 && \
     cd /usr/src/gtest && \
     cmake . && \
     make && \
     mkdir -p /usr/lib/gtest && \
     cp lib/*.a /usr/lib/gtest
+
+ENV LANG=pt_BR.UTF-8
+ENV LANGUAGE=pt_BR.UTF-8
+ENV LC_ALL=pt_BR.UTF-8
 CMD ["/bin/bash"]
 EOL
 
+  # If force rebuild is requested, remove existing image
+  if [[ $FORCE_REBUILD == true && $(sudo docker images -q sandbox) ]]; then
+    echo "Force rebuild: removing existing image 'sandbox'."
+    sudo docker rmi -f sandbox
+  fi
+
   # Build the Docker image
   sudo docker build -t sandbox .
+
 
   # Clean up the Dockerfile
   rm Dockerfile
@@ -99,9 +112,6 @@ mysql -h "$DB_HOST" -u "$DB_LOGIN" -p"$DB_PASSWORD" < insert_default_user.sql
 rm insert_default_user.sql
 
 
-DB_NAME="languid"
-DB_USER="andre"
-DB_PASS="1234"
 CSV_FILE="alunos.csv"
 
 while IFS=$'\t' read -r RM NOME GRUPO; do
@@ -111,13 +121,13 @@ while IFS=$'\t' read -r RM NOME GRUPO; do
     fi
 
     # Remove espaços extras do nome (email)
-    EMAIL=$(echo "$NOME" | xargs)
+    EMAIL=$(echo "$NOME" | iconv -f utf8 -t ascii//TRANSLIT | awk '{split($0, a, " "); print tolower(a[1]) "." tolower(a[NF])}')
 
     # Gera hash MD5 da RM
     HASH=$(echo -n "$RM" | md5sum | awk '{print $1}')
 
     # Insere no banco
-    mysql -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -e \
+    mysql -u "$DB_LOGIN" -p"$DB_PASSWORD" languid -e \
     "INSERT INTO user (email, passwdHash) VALUES ('$EMAIL', '$HASH') ON DUPLICATE KEY UPDATE email=email;"
 done < "$CSV_FILE"
 

@@ -8,7 +8,7 @@ TEST(ParOuImparTest, OutputTest)
     std::ifstream saida("saida.txt");
     std::string linha;
     std::getline(saida, linha);
-    EXPECT_EQ(linha, "Ímpar");
+    EXPECT_EQ(linha, "Impar");
 }
 
 int main(int argc, char **argv)

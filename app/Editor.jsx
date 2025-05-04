@@ -241,8 +241,9 @@ export default function Editor()
         if (index === currentExercise) return;
         if (hasUnsavedChanges())
         {
-            setPendingAction({ type: 'switch', value: index });
-            setShowUnsavedModal(true);
+            // TODO - Not working properly so, deactivates for now
+            // setPendingAction({ type: 'switch', value: index });
+            // setShowUnsavedModal(true);
         } else
         {
             setCurrentExercise(index);
@@ -258,7 +259,9 @@ export default function Editor()
         if (hasUnsavedChanges())
         {
             setPendingAction({ type: 'logout' });
-            setShowUnsavedModal(true);
+
+            // TODO - Not working properly so, deactivates for now
+            // setShowUnsavedModal(true);
         } else
         {
             doLogout();
@@ -276,7 +279,8 @@ export default function Editor()
     async function handleModalAction(action)
     {
         setModalError('');
-        setShowUnsavedModal(false);
+        // TODO - Not working properly so, deactivates for now
+        // setShowUnsavedModal(false);
         if (action === 'save')
         {
             try

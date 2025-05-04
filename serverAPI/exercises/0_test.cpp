@@ -8,7 +8,7 @@ TEST(HelloWorldTest, OutputTest)
     std::ifstream saida("saida.txt");
     std::string linha;
     std::getline(saida, linha);
-    EXPECT_EQ(linha, "Olá, Mundo!");
+    EXPECT_EQ(linha, "Ola, Mundo!");
 }
 
 int main(int argc, char **argv)
