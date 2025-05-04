@@ -224,8 +224,9 @@ export default function Editor()
         if (index === currentExercise) return;
         if (hasUnsavedChanges())
         {
-            setPendingAction({ type: 'switch', value: index });
-            setShowUnsavedModal(true);
+            // TODO - Not working properly so, deactivates for now
+            // setPendingAction({ type: 'switch', value: index });
+            // setShowUnsavedModal(true);
         } else
         {
             setCurrentExercise(index);
@@ -241,7 +242,9 @@ export default function Editor()
         if (hasUnsavedChanges())
         {
             setPendingAction({ type: 'logout' });
-            setShowUnsavedModal(true);
+
+            // TODO - Not working properly so, deactivates for now
+            // setShowUnsavedModal(true);
         } else
         {
             doLogout();
@@ -259,7 +262,8 @@ export default function Editor()
     async function handleModalAction(action)
     {
         setModalError('');
-        setShowUnsavedModal(false);
+        // TODO - Not working properly so, deactivates for now
+        // setShowUnsavedModal(false);
         if (action === 'save')
         {
             try
@@ -344,15 +348,13 @@ export default function Editor()
                 onOpenAccessibility={() => setShowAccessibilityModal(true)}
             />
 
-            <View style={styles.editorContainer}>
-                <CodeEditor
-                    styles={styles}
-                    code={code}
-                    setCode={setCode}
-                    selection={selection}
-                    setSelection={setSelection}
-                />
-            </View>
+            <CodeEditor
+                styles={styles}
+                code={code}
+                setCode={setCode}
+                selection={selection}
+                setSelection={setSelection}
+            />
 
             <Console
                 styles={styles}
@@ -383,11 +385,9 @@ export default function Editor()
                     <View style={{ backgroundColor: '#fff', padding: 24, borderRadius: 10, width: 300 }}>
                         <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12 }} accessibilityRole="header">Você tem alterações não salvas.</Text>
                         <Text style={{ marginBottom: 20 }}>Deseja salvar antes de continuar?</Text>
-
                         {modalError ? (
                             <Text style={{ color: '#f44336', marginBottom: 10 }}>{modalError}</Text>
                         ) : null}
-
                         <View style={{ flexDirection: 'column', justifyContent: 'space-between' }}>
                             <TouchableOpacity onPress={() => handleModalAction('save')} style={{ padding: 10 }} accessibilityLabel="Salvar e continuar" accessibilityRole="button">
                                 <Text style={{ color: '#2196F3', fontWeight: 'bold' }}>Salvar e continuar</Text>

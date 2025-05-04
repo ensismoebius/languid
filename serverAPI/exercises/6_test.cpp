@@ -8,7 +8,7 @@ TEST(MediaNumerosTest, OutputTest)
     std::ifstream saida("saida.txt");
     std::string linha;
     std::getline(saida, linha);
-    EXPECT_EQ(linha, "Média: 5.0");
+    EXPECT_EQ(linha, "Media: 5.0");
 }
 
 int main(int argc, char **argv)

@@ -9,10 +9,10 @@ TEST(MediaPonderadaTest, OutputTest)
     std::string linha;
     while (std::getline(saida, linha))
     {
-        if (linha.find("Média ponderada:") != std::string::npos)
+        if (linha.find("Media ponderada:") != std::string::npos)
             break;
     }
-    EXPECT_EQ(linha, "Média ponderada: 8.3");
+    EXPECT_EQ(linha, "Media ponderada: 8.3");
 }
 
 int main(int argc, char **argv)

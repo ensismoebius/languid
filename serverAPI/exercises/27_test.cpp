@@ -14,7 +14,7 @@ public:
     }
     std::string get() const
     {
-        return "Título: " + titulo + ", Autor: " + autor + ", Ano: " + std::to_string(ano);
+        return "Titulo: " + titulo + ", Autor: " + autor + ", Ano: " + std::to_string(ano);
     }
 };
 
@@ -22,5 +22,5 @@ TEST(LivroTest, ExibeCorretamente)
 {
     Livro l;
     l.set("Dom Casmurro", "Machado de Assis", 1899);
-    EXPECT_EQ(l.get(), "Título: Dom Casmurro, Autor: Machado de Assis, Ano: 1899");
+    EXPECT_EQ(l.get(), "Titulo: Dom Casmurro, Autor: Machado de Assis, Ano: 1899");
 }
