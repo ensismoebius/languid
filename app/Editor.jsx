@@ -110,23 +110,6 @@ export default function Editor()
         }
     }, [currentExercise, exercises]);
 
-    // Intercept navigation away (browser/tab close)
-    useEffect(() =>
-    {
-        function beforeUnload(e)
-        {
-            if (hasUnsavedChanges())
-            {
-                e.preventDefault();
-                e.returnValue = '';
-                return '';
-            }
-        };
-
-        window.addEventListener('beforeunload', beforeUnload);
-        return () => window.removeEventListener('beforeunload', beforeUnload);
-    }, [code, exercises, currentExercise]);
-
     if (!userToken) return <Redirect href="/" />;
 
     // Helper to update exercise status
