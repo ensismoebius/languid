@@ -41,8 +41,15 @@ ENV LC_ALL=pt_BR.UTF-8
 CMD ["/bin/bash"]
 EOL
 
+  # If force rebuild is requested, remove existing image
+  if [[ $FORCE_REBUILD == true && $(sudo docker images -q sandbox) ]]; then
+    echo "Force rebuild: removing existing image 'sandbox'."
+    sudo docker rmi -f sandbox
+  fi
+
   # Build the Docker image
   sudo docker build -t sandbox .
+
 
   # Clean up the Dockerfile
   rm Dockerfile
@@ -114,7 +121,7 @@ while IFS=$'\t' read -r RM NOME GRUPO; do
     fi
 
     # Remove espaços extras do nome (email)
-    EMAIL=$(echo "$NOME" | xargs)
+    EMAIL=$(echo "$NOME" | iconv -f utf8 -t ascii//TRANSLIT | awk '{split($0, a, " "); print tolower(a[1]) "." tolower(a[NF])}')
 
     # Gera hash MD5 da RM
     HASH=$(echo -n "$RM" | md5sum | awk '{print $1}')
