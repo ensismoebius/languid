@@ -5,8 +5,8 @@
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
     "lint": "expo lint"
@@ -47,7 +47,6 @@
     "react-native": "0.79.2",
     "react-native-code-editor": "^0.0.0",
     "react-native-gesture-handler": "~2.24.0",
-    "react-native-icons": "^0.7.1",
     "react-native-keychain": "^10.0.0",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-reanimated": "~3.17.4",
