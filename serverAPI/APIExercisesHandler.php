@@ -130,10 +130,10 @@ class APIExercisesHandler
         $tester->setCodeAndExercise($code, $exercise);
         $testResult = $tester->runTests();
 
-        $testResultJson = json_decode($testResult);
+        $testResultJson = json_decode($testResult ?? '{}');
 
         if (
-            $testResultJson->failures == 0 &&
+            $testResultJson?->failures == 0 &&
             $loginId !== null &&
             $exerciseId !== "0"
         ) {

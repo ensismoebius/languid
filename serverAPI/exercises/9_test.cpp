@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include "/tmp/code.cpp"
 
 TEST(TrocaValoresTest, TrocaCorreta)
 {

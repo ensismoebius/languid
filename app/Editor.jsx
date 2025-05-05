@@ -176,10 +176,23 @@ export default function Editor()
                 return;
             }
 
-            const testsData = JSON.parse(jsonData.message);
+            let testsData = null;
+
+            try
+            {
+                testsData = JSON.parse(jsonData.message);
+            } catch (error)
+            {
+                testsData = { failures: -1, message: jsonData.message };
+            }
+
             const failures = parseInt(testsData.failures || "0");
 
-            if (failures === 0)
+            if (failures === -1)
+            {
+                setConsoleOutput("Falha na execução: " + testsData.message);
+                updateExerciseStatus(false);
+            } else if (failures === 0)
             {
                 setConsoleOutput("Execução feita com sucesso: Vá para o próximo exercício");
                 updateExerciseStatus(true);
@@ -202,6 +215,7 @@ export default function Editor()
             {
                 setConsoleOutput(`Erro inesperado: ${error.message || error}`);
             }
+            updateExerciseStatus(false);
         } finally
         {
             setExecuting(false);
