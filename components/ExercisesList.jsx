@@ -1,10 +1,28 @@
 import React, { useRef, useEffect } from 'react';
-import { FlatList, TouchableOpacity, Text, View } from 'react-native';
+import { FlatList, TouchableOpacity, Text, View, Platform } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function ExercisesList({ styles, exercises, currentExercise, handleExerciseSelect })
 {
     const flatListRef = useRef(null);
+    const itemRefs = useRef([]);
+
+    const focusItemAtIndex = (index) =>
+    {
+        const ref = itemRefs.current[index];
+        if (!ref) return;
+
+        if (Platform.OS === 'web')
+        {
+            // Web: uso direto de .focus()
+            ref.focus?.();
+        } else
+        {
+            // Android: usa acessibilidade para simular foco
+            const node = findNodeHandle(ref);
+            if (node) AccessibilityInfo.setAccessibilityFocus(node);
+        }
+    };
 
     useEffect(() =>
     {
@@ -14,14 +32,7 @@ export default function ExercisesList({ styles, exercises, currentExercise, hand
             {
                 return;
             }
-            // Scroll to the current exercise index
-            // Isso garante que o FlatList seja rolado para o exercício atual
-            // e o item fique centralizado na tela
-            flatListRef.current.scrollToIndex({
-                index: currentExercise,
-                animated: true,
-                viewPosition: 0, // centraliza o item na tela
-            });
+            focusItemAtIndex(currentExercise);
         }
     }, [currentExercise]);
 
@@ -30,9 +41,10 @@ export default function ExercisesList({ styles, exercises, currentExercise, hand
             ref={flatListRef}
             data={exercises}
             horizontal
-            showsHorizontalScrollIndicator={false}
+            showsHorizontalScrollIndicator={true}
             renderItem={({ item, index }) => (
                 <TouchableOpacity
+                    ref={(element) => (itemRefs.current[index] = element)}
                     style={[
                         styles.exerciseItem,
                         currentExercise === index && styles.selectedExercise
