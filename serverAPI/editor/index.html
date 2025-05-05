@@ -15,18 +15,14 @@
             background-color: #1e1e1e;
         }
 
+        #form-title {
+            font-weight: bolder;
+        }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-        }
-
-        header {
-            background-color: #252526;
-            color: #61dafb;
-            padding: 1rem;
-            text-align: center;
-            border-bottom: 1px solid #333;
         }
 
         .login-container {
@@ -102,7 +98,7 @@
         }
 
         .code-editor {
-            min-height: 400px;
+            min-height: 200px;
             font-family: 'Consolas', 'Courier New', monospace;
             resize: vertical;
         }
@@ -173,10 +169,6 @@
 </head>
 
 <body>
-    <header>
-        <h1>Exercise Editor</h1>
-    </header>
-
     <div class="container">
         <!-- Login Section -->
         <div id="login-section" class="login-container">
@@ -209,7 +201,7 @@
 
             <!-- Exercise Form -->
             <div id="exercise-form-container" class="exercise-form hidden">
-                <h2 id="form-title">Edit Exercise</h2>
+                <div id="form-title">Edit Exercise</div>
                 <input type="hidden" id="exercise-id">
                 <div class="form-group">
                     <label for="title">Title:</label>
