@@ -19,6 +19,11 @@
             /* Prevent scrolling on body */
         }
 
+        .exercise-list li.selected {
+            background-color: #007acc;
+            color: white;
+        }
+
         #form-title {
             font-weight: bolder;
         }
@@ -602,6 +607,23 @@
             formMessage.className = type === 'error' ? 'error' : 'success';
             formMessage.classList.remove('hidden');
         }
+
+        exerciseList.addEventListener('click', function (e)
+        {
+            if (e.target.tagName === 'LI')
+            {
+                // Remove 'selected' de todos
+                Array.from(exerciseList.children).forEach(li => li.classList.remove('selected'));
+
+                // Adiciona 'selected' ao item clicado
+                e.target.classList.add('selected');
+
+                // Aqui você pode carregar os dados do exercício selecionado
+                const exerciseId = e.target.dataset.id;
+                loadExercise(exerciseId);
+            }
+        });
+
 
         // Event Listeners
         document.addEventListener('DOMContentLoaded', checkAuth);
