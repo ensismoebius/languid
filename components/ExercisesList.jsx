@@ -12,16 +12,7 @@ export default function ExercisesList({ styles, exercises, currentExercise, hand
         const ref = itemRefs.current[index];
         if (!ref) return;
 
-        if (Platform.OS === 'web')
-        {
-            // Web: uso direto de .focus()
-            ref.focus?.();
-        } else
-        {
-            // Android: usa acessibilidade para simular foco
-            const node = findNodeHandle(ref);
-            if (node) AccessibilityInfo.setAccessibilityFocus(node);
-        }
+        ref.focus?.();
     };
 
     useEffect(() =>

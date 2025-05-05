@@ -57,10 +57,10 @@ export default function Header({ styles, headerHeight, handleRunCode, executing,
 
             <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
                 <TouchableOpacity onPress={goPrev} disabled={isFirst} accessibilityLabel="Exercício anterior" accessibilityRole="button">
-                    <MaterialCommunityIcons name="chevron-left-circle" size={50} color={isFirst ? '#bbb' : '#fff'} accessibilityLabel="Ícone de seta para exercício anterior" importantForAccessibility="yes" />
+                    <MaterialCommunityIcons name="chevron-left-circle" size={40} color={isFirst ? '#bbb' : '#fff'} accessibilityLabel="Ícone de seta para exercício anterior" importantForAccessibility="yes" />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={goNext} disabled={isLast} accessibilityLabel="Próximo exercício" accessibilityRole="button">
-                    <MaterialCommunityIcons name="chevron-right-circle" size={50} color={isLast ? '#bbb' : '#fff'} accessibilityLabel="Ícone de seta para próximo exercício" importantForAccessibility="yes" />
+                    <MaterialCommunityIcons name="chevron-right-circle" size={40} color={isLast ? '#bbb' : '#fff'} accessibilityLabel="Ícone de seta para próximo exercício" importantForAccessibility="yes" />
                 </TouchableOpacity>
             </View>
         </View>
