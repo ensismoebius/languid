@@ -13,6 +13,10 @@
             line-height: 1.6;
             color: #e4e4e4;
             background-color: #1e1e1e;
+            height: 100vh;
+            /* Make body take full viewport height */
+            overflow: hidden;
+            /* Prevent scrolling on body */
         }
 
         #form-title {
@@ -21,8 +25,14 @@
 
         .container {
             max-width: 1200px;
+            height: 100vh;
+            /* Full viewport height */
             margin: 0 auto;
             padding: 20px;
+            box-sizing: border-box;
+            /* Include padding in height calculation */
+            display: flex;
+            flex-direction: column;
         }
 
         .login-container {
@@ -35,10 +45,46 @@
             background-color: #252526;
         }
 
+        /* Two-column layout */
+        .editor-layout {
+            display: flex;
+            gap: 20px;
+            height: 100%;
+            /* Take full height of container */
+            overflow: hidden;
+            /* Prevent layout overflow */
+        }
+
+        .sidebar {
+            width: 300px;
+            min-width: 250px;
+            background-color: #252526;
+            border-radius: 5px;
+            border: 1px solid #333;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            height: 100%;
+            /* Full height */
+        }
+
+        .content-area {
+            flex: 1;
+            min-width: 0;
+            height: 100%;
+            /* Full height */
+            display: flex;
+            flex-direction: column;
+        }
+
         .exercise-list {
-            margin-bottom: 20px;
             list-style: none;
             padding: 0;
+            overflow-y: auto;
+            flex-grow: 1;
+            /* Take remaining space */
+            margin: 0;
         }
 
         .exercise-list li {
@@ -56,12 +102,24 @@
             padding: 20px;
             border: 1px solid #333;
             border-radius: 5px;
-            margin-bottom: 20px;
             background-color: #252526;
+            flex-grow: 1;
+            /* Take remaining space */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .form-group {
             margin-bottom: 15px;
+        }
+
+        .form-group.code-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            /* Allow proper flex shrinking */
         }
 
         label {
@@ -93,14 +151,20 @@
         }
 
         textarea {
-            min-height: 200px;
             font-family: 'Consolas', 'Courier New', monospace;
         }
 
-        .code-editor {
-            min-height: 200px;
-            font-family: 'Consolas', 'Courier New', monospace;
+        #instructions {
+            min-height: 100px;
             resize: vertical;
+        }
+
+        .code-editor {
+            flex-grow: 1;
+            /* Take all available space */
+            font-family: 'Consolas', 'Courier New', monospace;
+            resize: none;
+            /* No need for resize with flex layout */
         }
 
         .btn {
@@ -159,10 +223,23 @@
             margin-bottom: 20px;
         }
 
+        .sidebar-actions {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
         h2 {
             color: #61dafb;
             border-bottom: 1px solid #333;
             padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        #editor-section {
+            height: 100%;
+            /* Full height when visible */
+            display: flex;
+            flex-direction: column;
         }
     </style>
     <script src="crypto-js.min.js"></script>
@@ -187,40 +264,46 @@
 
         <!-- Main Editor Section -->
         <div id="editor-section" class="hidden">
-            <div class="nav-buttons">
-                <button id="list-exercises-btn" class="btn">List Exercises</button>
-                <button id="new-exercise-btn" class="btn btn-success">New Exercise</button>
-                <button id="logout-btn" class="btn btn-danger">Logout</button>
-            </div>
+            <div class="editor-layout">
+                <!-- Sidebar with Exercise List -->
+                <div class="sidebar">
+                    <div class="nav-buttons">
+                        <button id="new-exercise-btn" class="btn btn-success">New Exercise</button>
+                        <button id="logout-btn" class="btn btn-danger">Logout</button>
+                    </div>
+                    <h2>Exercises</h2>
+                    <div class="sidebar-actions">
+                        <button id="refresh-exercises-btn" class="btn">Refresh List</button>
+                    </div>
+                    <ul id="exercise-list" class="exercise-list"></ul>
+                </div>
 
-            <!-- Exercise List -->
-            <div id="exercise-list-container">
-                <h2>Exercises</h2>
-                <ul id="exercise-list" class="exercise-list"></ul>
-            </div>
-
-            <!-- Exercise Form -->
-            <div id="exercise-form-container" class="exercise-form hidden">
-                <div id="form-title">Edit Exercise</div>
-                <input type="hidden" id="exercise-id">
-                <div class="form-group">
-                    <label for="title">Title:</label>
-                    <input type="text" id="title" name="title">
+                <!-- Main Content Area -->
+                <div class="content-area">
+                    <!-- Exercise Form -->
+                    <div id="exercise-form-container" class="exercise-form">
+                        <div id="form-title">Edit Exercise</div>
+                        <input type="hidden" id="exercise-id">
+                        <div class="form-group">
+                            <label for="title">Title:</label>
+                            <input type="text" id="title" name="title">
+                        </div>
+                        <div class="form-group">
+                            <label for="instructions">Instructions:</label>
+                            <textarea id="instructions" name="instructions"></textarea>
+                        </div>
+                        <div class="form-group code-area">
+                            <label for="test-file">Test File (C++):</label>
+                            <textarea id="test-file" name="test-file" class="code-editor"></textarea>
+                        </div>
+                        <div class="action-buttons">
+                            <button id="save-btn" class="btn btn-success">Save</button>
+                            <button id="cancel-btn" class="btn">Cancel</button>
+                            <button id="delete-btn" class="btn btn-danger hidden">Delete</button>
+                        </div>
+                        <p id="form-message" class="hidden"></p>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="instructions">Instructions:</label>
-                    <textarea id="instructions" name="instructions"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="test-file">Test File (C++):</label>
-                    <textarea id="test-file" name="test-file" class="code-editor"></textarea>
-                </div>
-                <div class="action-buttons">
-                    <button id="save-btn" class="btn btn-success">Save</button>
-                    <button id="cancel-btn" class="btn">Cancel</button>
-                    <button id="delete-btn" class="btn btn-danger hidden">Delete</button>
-                </div>
-                <p id="form-message" class="hidden"></p>
             </div>
         </div>
     </div>
@@ -233,7 +316,6 @@
         // DOM Elements
         const loginSection = document.getElementById('login-section');
         const editorSection = document.getElementById('editor-section');
-        const exerciseListContainer = document.getElementById('exercise-list-container');
         const exerciseFormContainer = document.getElementById('exercise-form-container');
         const exerciseList = document.getElementById('exercise-list');
         const formTitle = document.getElementById('form-title');
@@ -248,7 +330,7 @@
         const loginBtn = document.getElementById('login-btn');
         const logoutBtn = document.getElementById('logout-btn');
         const loginError = document.getElementById('login-error');
-        const listExercisesBtn = document.getElementById('list-exercises-btn');
+        const refreshExercisesBtn = document.getElementById('refresh-exercises-btn');
         const newExerciseBtn = document.getElementById('new-exercise-btn');
 
         // Check if user is logged in
@@ -341,8 +423,6 @@
                 if (data.status === 'success')
                 {
                     displayExercises(data.exercises);
-                    exerciseListContainer.classList.remove('hidden');
-                    exerciseFormContainer.classList.add('hidden');
                 } else
                 {
                     // Handle error
@@ -400,9 +480,6 @@
         // Display the exercise form with data
         function displayExerciseForm(exercise = null)
         {
-            exerciseListContainer.classList.add('hidden');
-            exerciseFormContainer.classList.remove('hidden');
-
             if (exercise)
             {
                 formTitle.textContent = 'Edit Exercise';
@@ -459,7 +536,7 @@
                 if (data.status === 'success')
                 {
                     showFormMessage(data.message, 'success');
-                    setTimeout(() => fetchExercises(), 1500);
+                    fetchExercises(); // Refresh exercise list immediately
                 } else
                 {
                     showFormMessage(data.message || 'Failed to save exercise', 'error');
@@ -501,7 +578,12 @@
                 if (data.status === 'success')
                 {
                     showFormMessage(data.message, 'success');
-                    setTimeout(() => fetchExercises(), 1500);
+
+                    // Clear the form
+                    displayExerciseForm();
+
+                    // Refresh exercise list
+                    fetchExercises();
                 } else
                 {
                     showFormMessage(data.message || 'Failed to delete exercise', 'error');
@@ -526,9 +608,9 @@
         loginBtn.addEventListener('click', login);
         logoutBtn.addEventListener('click', logout);
         saveBtn.addEventListener('click', saveExercise);
-        cancelBtn.addEventListener('click', fetchExercises);
+        cancelBtn.addEventListener('click', () => displayExerciseForm());
         deleteBtn.addEventListener('click', deleteExercise);
-        listExercisesBtn.addEventListener('click', fetchExercises);
+        refreshExercisesBtn.addEventListener('click', fetchExercises);
         newExerciseBtn.addEventListener('click', () => displayExerciseForm());
     </script>
 </body>
