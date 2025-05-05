@@ -65,10 +65,12 @@ export function createStyles(headerHeight)
         exerciseText: {
             color: '#333',
             fontWeight: 'bold',
+            fontSize: 15
         },
         exerciseCounter: {
             color: '#fff',
             fontWeight: 'bold',
+            fontSize: 15,
             marginLeft: 10,
         },
         flatListContent: {
