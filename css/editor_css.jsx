@@ -48,7 +48,7 @@ export function createStyles(headerHeight)
         },
         exerciseItem: {
             padding: 5,
-            marginLeft: 1,
+            marginLeft: 6,
             backgroundColor: '#eee',
             borderRadius: 5,
             alignItems: 'center',
