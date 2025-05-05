@@ -1,22 +1,16 @@
 #include <gtest/gtest.h>
-#include <fstream>
-#include <cstdlib>
+#include "/tmp/code.cpp"  // Inclui o vetor e a função
 
-TEST(MediaPonderadaTest, OutputTest)
-{
-    system("echo '7 8 9\n2 3 5' | /tmp/code_exec > saida.txt");
-    std::ifstream saida("saida.txt");
-    std::string linha;
-    while (std::getline(saida, linha))
-    {
-        if (linha.find("Media ponderada:") != std::string::npos)
-            break;
-    }
-    EXPECT_EQ(linha, "Media ponderada: 8.3");
+TEST(NotasTest, TamanhoCorreto) {
+    EXPECT_EQ(notas.size(), 3);
 }
 
-int main(int argc, char **argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+TEST(NotasTest, ValoresEsperados) {
+    EXPECT_FLOAT_EQ(notas[0], 5.0f);
+    EXPECT_FLOAT_EQ(notas[1], 10.0f);
+    EXPECT_FLOAT_EQ(notas[2], 2.0f);
+}
+
+TEST(PrimeiraNotaTest, RetornaCorretamente) {
+    EXPECT_FLOAT_EQ(primeiraNota(), 5.0f);
 }

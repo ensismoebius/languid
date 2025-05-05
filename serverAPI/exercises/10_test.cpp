@@ -1,22 +1,13 @@
 #include <gtest/gtest.h>
-#include <fstream>
-#include <cstdlib>
+#include <vector>
+#include "/tmp/code.cpp"  // Inclui a função a ser testada
 
-TEST(BuscaVetorTest, Encontrado)
-{
-    system("echo '1 2 3 4 5 6 7 8 9 10\n7' | /tmp/code_exec > saida.txt");
-    std::ifstream saida("saida.txt");
-    std::string linha;
-    while (std::getline(saida, linha))
-    {
-        if (linha == "Encontrado")
-            break;
-    }
-    EXPECT_EQ(linha, "Encontrado");
+TEST(CriaVetorTest, RetornaVetorCom10Elementos) {
+    std::vector<int> v = criaVetor();
+    EXPECT_EQ(v.size(), 10);
 }
 
-int main(int argc, char **argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+TEST(CriaVetorTest, NaoVazio) {
+    std::vector<int> v = criaVetor();
+    EXPECT_FALSE(v.empty());
 }

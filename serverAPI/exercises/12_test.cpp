@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include "/tmp/code.cpp"  // Inclui o vetor e a função
 
 TEST(FuncaoMaximoTest, MaximoCorreto)
 {

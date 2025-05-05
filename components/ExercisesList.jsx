@@ -44,12 +44,12 @@ export default function ExercisesList({ styles, exercises, currentExercise, hand
                     accessibilityLabel={`Selecionar exercício: ${item.title}`}
                 >
                     <View style={[styles.exerciseItemContent, { flexDirection: 'row', alignItems: 'center' }]}>
-                        <Text style={styles.exerciseText}>{item.title}</Text>
                         <MaterialCommunityIcons
                             name={item.done ? 'check-circle-outline' : 'checkbox-blank-circle-outline'}
                             size={20}
                             color={item.done ? 'green' : 'gray'}
                         />
+                        <Text style={styles.exerciseText}>{item.title}</Text>
                     </View>
                 </TouchableOpacity>
             )}

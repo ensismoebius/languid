@@ -1,18 +1,13 @@
 #include <gtest/gtest.h>
-#include <fstream>
-#include <cstdlib>
+#include "code.cpp"
 
-TEST(InversaoVetorTest, OutputTest)
-{
-    system("echo '1 2 3 4 5' | /tmp/code_exec > saida.txt");
-    std::ifstream saida("saida.txt");
-    std::string linha;
-    std::getline(saida, linha);
-    EXPECT_EQ(linha, "5 4 3 2 1");
+TEST(NotasTest, TamanhoOriginal) {
+    EXPECT_EQ(notas.size(), 3);
 }
 
-int main(int argc, char **argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+TEST(OutrasNotasTest, RetornaDuasUltimasNotas) {
+    std::vector<float> esperado = {10.0f, 2.0f};
+    EXPECT_EQ(outrasNotas().size(), 2);
+    EXPECT_FLOAT_EQ(outrasNotas()[0], esperado[0]);
+    EXPECT_FLOAT_EQ(outrasNotas()[1], esperado[1]);
 }
