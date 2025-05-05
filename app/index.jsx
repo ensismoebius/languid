@@ -23,9 +23,9 @@ export default function LoginScreen()
 
   const [username, setUser] = useState('');
   const [password, setPass] = useState('');
+  const [error, setError] = useState(null);
   const [hidden, setHidden] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   async function checkLogin()
   {

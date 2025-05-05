@@ -177,7 +177,6 @@ export default function Editor()
             }
 
             let testsData = null;
-
             try
             {
                 testsData = JSON.parse(jsonData.message);
