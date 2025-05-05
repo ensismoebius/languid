@@ -21,7 +21,6 @@ import
 } from 'expo-router';
 
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigationState } from '@react-navigation/native';
 
 import Header from '../components/Header';
 import Console from '../components/Console';
@@ -53,7 +52,6 @@ export default function Editor()
     const [theme, setTheme] = useState('default');
 
     const router = useRouter();
-    const routeName = useNavigationState(state => state.routes[state.index]?.name);
 
     const { userToken } = useContext(AuthContext);
     const { logout } = useContext(AuthContext);
@@ -123,16 +121,6 @@ export default function Editor()
         });
     };
 
-    // Helper to handle unauthorized
-    function handleUnauthorized(response)
-    {
-        if (response.status === 401)
-        {
-            router.replace('/');
-            return true;
-        }
-        return false;
-    };
 
     async function handleRunCode()
     {
@@ -255,9 +243,6 @@ export default function Editor()
         if (hasUnsavedChanges())
         {
             setPendingAction({ type: 'logout' });
-
-            // TODO - Not working properly so, deactivates for now
-            // setShowUnsavedModal(true);
         } else
         {
             doLogout();
@@ -275,8 +260,6 @@ export default function Editor()
     async function handleModalAction(action)
     {
         setModalError('');
-        // TODO - Not working properly so, deactivates for now
-        // setShowUnsavedModal(false);
         if (action === 'save')
         {
             try
