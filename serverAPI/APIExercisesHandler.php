@@ -163,6 +163,17 @@ class APIExercisesHandler
 
     private function handleGetRequest()
     {
+
+        $this->requireValidToken();
+        $token = $this->getBearerToken();
+
+        list($encodedPayload, $encodedSignature) = explode('.', $token);
+        $payloadJson = base64_decode(strtr($encodedPayload, '-_', '+/'));
+        $payload = json_decode($payloadJson, true);
+
+        $loginId = intval($payload['sub'] ?? 0);
+
+
         $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         if ($conn->connect_error) {
             http_response_code(500);
@@ -170,7 +181,7 @@ class APIExercisesHandler
             exit;
         }
 
-        $sql = "SELECT E.id, E.title, E.testFileName, E.instructions, COALESCE(UE.done, 0) as done, UE.code FROM exercise as E LEFT JOIN user_exercise as UE ON E.id = UE.exerciseId;";
+        $sql = "SELECT E.id, E.title, E.testFileName, E.instructions, COALESCE(UE.done, 0) as done, UE.code FROM exercise as E LEFT JOIN user_exercise as UE ON E.id = UE.exerciseId AND UE.loginId = " . $loginId;
         $result = $conn->query($sql);
         $exercises = [];
         if ($result && $result->num_rows > 0) {
@@ -183,40 +194,7 @@ class APIExercisesHandler
         exit;
     }
 
-    private function handleLogin($username, $password)
-    {
-        $authHandler = new AuthHandler();
-        $connectionMessage = $authHandler->connect();
 
-        if ($connectionMessage !== "Connected successfully") {
-            http_response_code(500);
-            return json_encode(
-                [
-                    "status" => "error",
-                    "message" => $connectionMessage
-                ]
-            );
-        }
-
-        $token = $authHandler->authenticate($username, $password);
-
-        if ($token) {
-            return json_encode(
-                [
-                    "status" => "success",
-                    "token" => $token
-                ]
-            );
-        } else {
-            http_response_code(401);
-            return json_encode(
-                [
-                    "status" => "error",
-                    "message" => "Invalid credentials"
-                ]
-            );
-        }
-    }
 }
 
 // Instantiate and handle the request
