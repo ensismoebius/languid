@@ -49,7 +49,7 @@ export default function CodeEditor({ styles, code, setCode, selection, setSelect
                 style={[styles.inputCode, styles.scrollView]}
                 placeholderTextColor="#ffffffaa"
                 multiline
-                value={code}
+                value={code || `/*\n${instruction}\n*/`}
                 onChangeText={setCode}
                 autoCapitalize="none"
                 autoCorrect={false}
