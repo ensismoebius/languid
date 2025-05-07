@@ -144,8 +144,8 @@ function createStylesLight(headerHeight)
                 width: 200,
                 height: 5,
                 borderRadius: 3,
-                backgroundColor: '#000',
-                margin: 0,
+                backgroundColor: 'orange',
+                margin: 2,
             },
             horizontalHandleDimentions:
                 Platform.select({
@@ -505,7 +505,7 @@ function createStylesHighContrast(headerHeight)
                 borderRadius: 8,
                 backgroundColor: '#FFD700',
                 margin: 0,
-                zIndex:5
+                zIndex: 5
             },
             horizontalHandleDimentions:
                 Platform.select({

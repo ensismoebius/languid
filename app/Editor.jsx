@@ -326,7 +326,7 @@ export default function Editor()
             return ['#000', '#444', '#000'];
         } else if (theme === 'light')
         {
-            return ['#fff', '#eee', '#2196F3'];
+            return ['orange', '#eee', '#2196F3'];
         } else if (theme === 'dark')
         {
             return ['#100', '#000', '#001'];
