@@ -501,29 +501,30 @@ function createStylesHighContrast(headerHeight)
             },
             handle: {
                 width: 200,
-                height: 5,
-                borderRadius: 3,
+                height: 15,
+                borderRadius: 8,
                 backgroundColor: '#FFD700',
                 margin: 0,
+                zIndex:5
             },
             horizontalHandleDimentions:
                 Platform.select({
                     ios: {
                         width: '100%',
                         alignItems: 'center',
-                        margin: 0,
+                        margin: 5,
                         height: 15,
                     },
                     android: {
                         width: '100%',
                         alignItems: 'center',
-                        margin: 0,
+                        margin: 5,
                         height: 15
                     },
                     web: {
                         width: '100%',
                         alignItems: 'center',
-                        margin: 3,
+                        margin: 5,
                     },
                 }),
             consoleContainer: {

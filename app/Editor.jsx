@@ -323,13 +323,13 @@ export default function Editor()
     {
         if (theme === 'high-contrast')
         {
-            return ['#000', '#fff', '#ff0']; // black bg, white fg, yellow accent
+            return ['#000', '#444', '#000'];
         } else if (theme === 'light')
         {
             return ['#fff', '#eee', '#2196F3'];
         } else if (theme === 'dark')
         {
-            return ['#222', '#333', '#FF8E53'];
+            return ['#100', '#000', '#001'];
         }
         return ['#FF6B6B', '#FF8E53', '#FFAF40']; // default
     };
