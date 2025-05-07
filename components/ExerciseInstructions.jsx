@@ -1,12 +1,11 @@
 import { useRef, useState } from 'react';
-import { Animated, TextInput, TouchableOpacity, View } from 'react-native';
+import { Animated, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function ExerciseInstructions({ styles, instruction })
 {
     const [isVisible, setIsVisible] = useState(true);
 
     const heightAnim = useRef(new Animated.Value(styles.instructions.minHeight)).current;
-
 
     function toggleInput()
     {
@@ -25,18 +24,21 @@ export default function ExerciseInstructions({ styles, instruction })
                 <View style={styles.handle} />
             </TouchableOpacity>
             <Animated.View style={{ overflow: 'hidden', height: heightAnim }}>
-                <TextInput
+                <ScrollView
                     style={styles.instructions}
-                    multiline
-                    value={instruction}
-                    editable={false}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    spellCheck={false}
-                    accessibilityLabel="Instruções do exercício"
-                    accessibilityRole="text"
-                    accessibilityLiveRegion="polite"
-                />
+                    contentContainerStyle={{ padding: 8, paddingBottom: 20 }}
+                    showsVerticalScrollIndicator={true}
+                    scrollEnabled={true}
+                >
+                    <Text
+                        selectable
+                        accessibilityLabel="Instruções do exercício"
+                        accessibilityRole="text"
+                        accessibilityLiveRegion="polite"
+                    >
+                        {instruction}
+                    </Text>
+                </ScrollView>
             </Animated.View>
         </View >
     );

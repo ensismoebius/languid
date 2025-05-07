@@ -124,11 +124,26 @@ export function createStyles(headerHeight)
             backgroundColor: '#aaa',
             margin: 0,
         },
-        horizontalHandleDimentions: {
-            width: '100%',
-            alignItems: 'center',
-            margin: 0,
-        },
+        horizontalHandleDimentions:
+            Platform.select({
+                ios: {
+                    width: '100%',
+                    alignItems: 'center',
+                    margin: 0,
+                    height: 15,
+                },
+                android: {
+                    width: '100%',
+                    alignItems: 'center',
+                    margin: 0,
+                    height: 15
+                },
+                web: {
+                    width: '100%',
+                    alignItems: 'center',
+                    margin: 0,
+                },
+            }),
         consoleContainer: {
             backgroundColor: '#1e1e1e',
             borderRadius: 10,
