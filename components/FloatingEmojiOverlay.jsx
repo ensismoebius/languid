@@ -2,7 +2,7 @@ import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Animated, Dimensions, StyleSheet, Text, View } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
-const DEFAULT_EMOJIS = ['🎉', '❤️', '😄'];
+const DEFAULT_EMOJIS = ['🎉', '👽', '😃'];
 
 const FloatingEmojiOverlay = forwardRef((_, ref) =>
 {
