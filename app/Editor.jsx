@@ -34,16 +34,9 @@ import { AuthContext } from '../contexts/AuthContext';
 
 export default function Editor()
 {
+    const headerHeight = 80;
 
     const emojiRef = useRef();
-
-    const triggerEmojis = () =>
-    {
-        emojiRef.current?.spawnEmoji(); // optionally pass a custom emoji list
-    };
-
-    const headerHeight = 80;
-    const styles = createStyles(headerHeight);
     const consoleScrollViewRef = useRef(null);
 
     // State variables
@@ -58,7 +51,9 @@ export default function Editor()
     const [executing, setExecuting] = useState(false);
     const [modalError, setModalError] = useState('');
     const [exercises, setExercises] = useState([]);
-    const [theme, setTheme] = useState('default');
+    const [theme, setTheme] = useState('light');
+
+    const styles = createStyles(headerHeight, theme);
 
     const router = useRouter();
 
@@ -121,6 +116,11 @@ export default function Editor()
     }, [currentExercise, exercises]);
 
     if (!userToken) return <Redirect href="/" />;
+
+    function triggerEmojis()
+    {
+        emojiRef.current?.spawnEmoji();
+    };
 
     // Helper to update exercise status
     function updateExerciseStatus(done)
@@ -421,21 +421,18 @@ export default function Editor()
             >
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
                     <View style={{ backgroundColor: '#fff', padding: 24, borderRadius: 10, width: 300 }}>
-                        <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>Acessibilidade</Text>
+                        <Text style={{ fontSize: 25, fontWeight: 'bold', marginBottom: 12 }}>Acessibilidade:</Text>
                         <TouchableOpacity onPress={() => { setTheme('high-contrast'); setShowAccessibilityModal(false); }} accessibilityLabel="Ativar alto contraste" accessibilityRole="button" style={{ padding: 10 }}>
-                            <Text style={{ color: '#000', fontWeight: 'bold' }}>Alto contraste</Text>
+                            <Text style={{ color: '#000', fontWeight: 'bold', fontSize: 25 }}>Alto contraste</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => { setTheme('light'); setShowAccessibilityModal(false); }} accessibilityLabel="Ativar modo claro" accessibilityRole="button" style={{ padding: 10 }}>
-                            <Text style={{ color: '#2196F3', fontWeight: 'bold' }}>Modo claro</Text>
+                            <Text style={{ color: '#2196F3', fontWeight: 'bold', fontSize: 25 }}>Modo claro</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => { setTheme('dark'); setShowAccessibilityModal(false); }} accessibilityLabel="Ativar modo escuro" accessibilityRole="button" style={{ padding: 10 }}>
-                            <Text style={{ color: '#333', fontWeight: 'bold' }}>Modo escuro</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => { setTheme('default'); setShowAccessibilityModal(false); }} accessibilityLabel="Restaurar tema padrão" accessibilityRole="button" style={{ padding: 10 }}>
-                            <Text style={{ color: '#FF6B6B', fontWeight: 'bold' }}>Tema padrão</Text>
+                            <Text style={{ color: '#333', fontWeight: 'bold', fontSize: 25 }}>Modo escuro</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => setShowAccessibilityModal(false)} accessibilityLabel="Fechar opções de acessibilidade" accessibilityRole="button" style={{ padding: 10, marginTop: 10 }}>
-                            <Text style={{ color: '#f44336', fontWeight: 'bold' }}>Fechar</Text>
+                            <Text style={{ color: '#f44336', fontWeight: 'bold', fontSize: 25 }}>Fechar</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

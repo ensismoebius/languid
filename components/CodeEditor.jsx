@@ -1,6 +1,6 @@
 import React from 'react';
 import Editor from "@monaco-editor/react";
-import { Platform, ScrollView, TextInput, View } from 'react-native';
+import { Platform, TextInput, View } from 'react-native';
 
 export default function CodeEditor({ styles, code, setCode, selection, setSelection })
 {
@@ -34,7 +34,7 @@ export default function CodeEditor({ styles, code, setCode, selection, setSelect
                     onChange={setCode}
                     theme="vs-dark"
                     options={{
-                        fontSize: 20,
+                        fontSize: styles.inputCode.fontSize,
                         wordWrap: 'on',
                         minimap: { enabled: true },
                         automaticLayout: true,

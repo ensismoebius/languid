@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { TouchableOpacity } from 'react-native';
 import { AuthContext } from '../contexts/AuthContext';
 import { useRouter } from 'expo-router';
-import logoutButtonStyles from '../css/logout_button_css';
+import { logoutButtonStyles } from '../css/logout_button_css';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const LogoutButton = () =>
