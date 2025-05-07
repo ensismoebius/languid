@@ -31,6 +31,7 @@ export default function ExerciseInstructions({ styles, instruction })
                     scrollEnabled={true}
                 >
                     <Text
+                        style={styles.instructionsText}
                         selectable
                         accessibilityLabel="Instruções do exercício"
                         accessibilityRole="text"

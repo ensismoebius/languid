@@ -104,18 +104,20 @@ export function createStyles(headerHeight)
         instructions: {
             width: '100%',
             padding: 15,
-            fontSize: 16,
             elevation: 5,
             marginTop: 0,
             lineHeight: 24,
             shadowRadius: 5,
             borderRadius: 10,
             shadowOpacity: 0.7,
-            color: '#333',
             shadowColor: '#000',
             backgroundColor: 'white',
             shadowOffset: { width: 0, height: 2 },
             minHeight: Dimensions.get('window').height * 0.3 - 100,
+        },
+        instructionsText: {
+            fontSize: 20,
+            color: '#333',
         },
         handle: {
             width: 150,
