@@ -74,7 +74,7 @@ export default function Editor()
                         title: ex.title,
                         code: ex.code || '',
                         done: Boolean(ex.done == 1),
-                        testFileName: ex.testFileName || '',
+                        testFileName: ex.testFileName || ex.testfilename || '',
                         instruction: ex.instructions || ex.instruction || '',
                     })));
                 } else

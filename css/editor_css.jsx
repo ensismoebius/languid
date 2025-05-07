@@ -98,7 +98,7 @@ export function createStyles(headerHeight)
             borderColor: '#ffffff30',
             textAlignVertical: 'top',
             backgroundColor: '#1e1e1e',
-            minHeight: Dimensions.get('window').height * 0.3 - 100,
+            minHeight: Dimensions.get('window').height * 0.5 - 100,
             fontFamily: Platform.select({ ios: 'Courier', android: 'monospace' }),
         },
         instructions: {
@@ -115,7 +115,7 @@ export function createStyles(headerHeight)
             shadowColor: '#000',
             backgroundColor: 'white',
             shadowOffset: { width: 0, height: 2 },
-            minHeight: Dimensions.get('window').height * 0.5 - 100,
+            minHeight: Dimensions.get('window').height * 0.3 - 100,
         },
         consoleContainer: {
             backgroundColor: '#1e1e1e',
@@ -125,6 +125,7 @@ export function createStyles(headerHeight)
             marginBottom: 10,
         },
         consoleHeader: {
+            minHeight: Dimensions.get('window').height * 0.2 - 100,
             backgroundColor: '#333',
             padding: 10,
             borderTopLeftRadius: 10,

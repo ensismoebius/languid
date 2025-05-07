@@ -163,8 +163,13 @@ class APIExercisesHandler
 
     private function handleGetRequest()
     {
+        $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        if ($conn->connect_error) {
+            http_response_code(500);
+            echo json_encode(["status" => "error", "message" => "Database connection failed: " . $conn->connect_error]);
+            exit;
+        }
 
-        $this->requireValidToken();
         $token = $this->getBearerToken();
 
         list($encodedPayload, $encodedSignature) = explode('.', $token);
@@ -173,15 +178,8 @@ class APIExercisesHandler
 
         $loginId = intval($payload['sub'] ?? 0);
 
+        $sql = "select E.id, E.title, E.testfilename, E.instructions, COALESCE(UE.done, 0) as done, UE.code from exercise as E left join user_exercise as UE on E.id = UE.exerciseid and UE.loginid = $loginId";
 
-        $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-        if ($conn->connect_error) {
-            http_response_code(500);
-            echo json_encode(["status" => "error", "message" => "Database connection failed: " . $conn->connect_error]);
-            exit;
-        }
-
-        $sql = "SELECT E.id, E.title, E.testFileName, E.instructions, COALESCE(UE.done, 0) as done, UE.code FROM exercise as E LEFT JOIN user_exercise as UE ON E.id = UE.exerciseId AND UE.loginId = " . $loginId;
         $result = $conn->query($sql);
         $exercises = [];
         if ($result && $result->num_rows > 0) {
@@ -194,7 +192,40 @@ class APIExercisesHandler
         exit;
     }
 
+    private function handleLogin($username, $password)
+    {
+        $authHandler = new AuthHandler();
+        $connectionMessage = $authHandler->connect();
 
+        if ($connectionMessage !== "Connected successfully") {
+            http_response_code(500);
+            return json_encode(
+                [
+                    "status" => "error",
+                    "message" => $connectionMessage
+                ]
+            );
+        }
+
+        $token = $authHandler->authenticate($username, $password);
+
+        if ($token) {
+            return json_encode(
+                [
+                    "status" => "success",
+                    "token" => $token
+                ]
+            );
+        } else {
+            http_response_code(401);
+            return json_encode(
+                [
+                    "status" => "error",
+                    "message" => "Invalid credentials"
+                ]
+            );
+        }
+    }
 }
 
 // Instantiate and handle the request
