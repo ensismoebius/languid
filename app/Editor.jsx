@@ -26,6 +26,7 @@ import Header from '../components/Header';
 import Console from '../components/Console';
 import CodeEditor from '../components/CodeEditor';
 import ExerciseInstructions from '../components/ExerciseInstructions';
+import FloatingEmojiOverlay from '../components/FloatingEmojiOverlay';
 
 import { apiRequest } from '../utils/api';
 import { createStyles } from '../css/editor_css';
@@ -33,6 +34,14 @@ import { AuthContext } from '../contexts/AuthContext';
 
 export default function Editor()
 {
+
+    const emojiRef = useRef();
+
+    const triggerEmojis = () =>
+    {
+        emojiRef.current?.spawnEmoji(); // optionally pass a custom emoji list
+    };
+
     const headerHeight = 80;
     const styles = createStyles(headerHeight);
     const consoleScrollViewRef = useRef(null);
@@ -62,6 +71,9 @@ export default function Editor()
         {
             try
             {
+                setShowConsole(false);
+                setConsoleOutput('');
+
                 const jsonData = await apiRequest({
                     method: 'GET',
                     userToken
@@ -182,6 +194,7 @@ export default function Editor()
             } else if (failures === 0)
             {
                 setConsoleOutput("Execução feita com sucesso: Vá para o próximo exercício");
+                triggerEmojis();
                 updateExerciseStatus(true);
             } else
             {
@@ -427,6 +440,7 @@ export default function Editor()
                     </View>
                 </View>
             </Modal>
+            <FloatingEmojiOverlay ref={emojiRef} />
         </LinearGradient>
     );
 }
