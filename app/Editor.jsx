@@ -363,6 +363,7 @@ export default function Editor()
                 setCode={setCode}
                 selection={selection}
                 setSelection={setSelection}
+                instruction={exercises.length > 0 && exercises[currentExercise] ? exercises[currentExercise].instruction : ''}
             />
 
             <Console

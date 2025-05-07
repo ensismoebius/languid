@@ -2,7 +2,7 @@ import React from 'react';
 import Editor from "@monaco-editor/react";
 import { Platform, TextInput, View } from 'react-native';
 
-export default function CodeEditor({ styles, code, setCode, selection, setSelection })
+export default function CodeEditor({ styles, code, setCode, selection, setSelection, instruction })
 {
     const handleEditorDidMount = (editor, monaco) =>
     {
@@ -30,7 +30,7 @@ export default function CodeEditor({ styles, code, setCode, selection, setSelect
             <View style={[styles.scrollView]}>
                 <Editor
                     defaultLanguage="cpp"
-                    value={code}
+                    value={code || `/*\n${instruction}\n*/`}
                     onChange={setCode}
                     theme="vs-dark"
                     options={{
