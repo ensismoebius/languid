@@ -1,0 +1,30 @@
+{
+  "cli": {
+    "version": ">= 16.4.1",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "EXPO_USE_LEGACY_PEER_DEPS": "1"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_USE_LEGACY_PEER_DEPS": "1"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+        "EXPO_USE_LEGACY_PEER_DEPS": "1"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

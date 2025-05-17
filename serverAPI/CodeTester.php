@@ -15,7 +15,8 @@ class CodeTester
         $contents = file_get_contents($filePath);
 
         // Remove comments (both single-line and multi-line)
-        $contents = preg_replace('~//.*?$|/\*.*?\*/~s', '', $contents);
+        // $contents = preg_replace('~//.*?$|/\*.*?\*/~s', '', $contents);
+        $contents = preg_replace('/^\/\*(.|\n)*\*\/$|^\/\/.*$/m', '', $contents);
 
         // Normalize whitespace
         $contents = preg_replace('/\s+/', ' ', $contents);
