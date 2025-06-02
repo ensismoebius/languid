@@ -130,6 +130,8 @@ class APIExercisesHandler
         $tester->setCodeAndExercise($code, $exercise);
         $testResult = $tester->runTests();
 
+        // Checks if the tests were executed successfully
+        // If not, we return the error message
         if (!$testResult->success) {
             $response = [
                 "message" => $testResult->value,
@@ -140,8 +142,22 @@ class APIExercisesHandler
             exit;
         }
 
+        // If the code has been executed but returned an error
+        // message,then we return the error message
         $codeExecutionResult = json_decode($testResult->value);
+        if (is_null($codeExecutionResult)) {
+            $response = [
+                "message" => $testResult->value,
+                "status" => "fail"
+            ];
 
+            echo json_encode($response);
+            exit;
+        }
+
+        // If the code has been executed successfully and
+        // the tests have passed, we handle the exercise done
+        // and return the result of the code execution
         if (
             $codeExecutionResult->failures == 0 &&
             $loginId !== null &&
@@ -150,10 +166,14 @@ class APIExercisesHandler
             $this->handleExerciseDone($loginId, $exerciseId, $code);
         }
 
-
+        // If the code gets to here, it means that the code
+        // has been executed successfully, but the tests has
+        // failed. We still want to return the result of the
+        // code execution, so we return the value of the test
+        // result, which is the output of the code execution.
         $response = [
-            "message" => $testResult->value ?? "No output",
-            "status" => is_null($testResult) ? "fail" : "success"
+            "message" => $testResult->value,
+            "status" => "success"
         ];
         echo json_encode($response);
     }
