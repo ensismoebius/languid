@@ -36,12 +36,54 @@ class APIExercisesHandler
         }
     }
 
+
     private function setHeaders()
     {
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
         header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, X-API-KEY");
         header("Content-Type: application/json");
+    }
+
+    // Helper: send error response and exit
+    private function sendError($message, $statusCode = 400, $status = "error")
+    {
+        http_response_code($statusCode);
+        echo json_encode(["status" => $status, "message" => $message]);
+        exit;
+    }
+
+    // Helper: send success response and exit
+    private function sendSuccess($data)
+    {
+        echo json_encode(["status" => "success"] + $data);
+        exit;
+    }
+
+    // Helper: get DB connection or send error
+    private function getDbConnection()
+    {
+        $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        if ($conn->connect_error) {
+            $this->sendError("Database connection failed: " . $conn->connect_error, 500);
+        }
+        return $conn;
+    }
+
+    // Helper: decode JWT payload from token
+    private function getPayloadFromToken($token)
+    {
+        $parts = explode('.', $token);
+        if (count($parts) !== 2) {
+            $this->sendError("Invalid token format", 401);
+        }
+        list($encodedPayload, $encodedSignature) = $parts;
+        $payloadJson = base64_decode(strtr($encodedPayload, '-_', '+/'));
+        $payload = json_decode($payloadJson, true);
+        if (!$payload) {
+            $this->sendError("Invalid token payload", 401);
+        }
+        return $payload;
     }
 
     private function validateAPIKey()
@@ -80,16 +122,12 @@ class APIExercisesHandler
     {
         $token = $this->getBearerToken();
         if (!$token) {
-            http_response_code(401);
-            echo json_encode(["status" => "error", "message" => "Missing or invalid Authorization header"]);
-            exit;
+            $this->sendError("Missing or invalid Authorization header", 401);
         }
         $authHandler = new AuthHandler();
         $authHandler->connect();
         if (!$authHandler->verifyToken($token)) {
-            http_response_code(401);
-            echo json_encode(["status" => "expired", "message" => "Token expired or invalid"]);
-            exit;
+            $this->sendError("Token expired or invalid", 401, "expired");
         }
     }
 
@@ -97,8 +135,7 @@ class APIExercisesHandler
     {
         $input = json_decode(file_get_contents("php://input"), true);
         if (!$input) {
-            echo json_encode(["status" => "error", "message" => "Invalid JSON data"]);
-            exit;
+            $this->sendError("Invalid JSON data");
         }
         $input = $this->sanitizeInput($input);
         if (isset($input['username']) && isset($input['password'])) {
@@ -112,18 +149,7 @@ class APIExercisesHandler
         $exercise = $input["exercise"] ?? "";
         $exerciseId = $input["exerciseId"] ?? "0";
         $token = $this->getBearerToken();
-
-        $parts = explode('.', $token);
-        if (count($parts) !== 2) {
-            return false; // Invalid token format
-        }
-
-        list($encodedPayload, $encodedSignature) = $parts;
-
-        // Decode payload
-        $payloadJson = base64_decode(strtr($encodedPayload, '-_', '+/'));
-        $payload = json_decode($payloadJson, true);
-
+        $payload = $this->getPayloadFromToken($token);
         $loginId = $payload['sub'] ?? null;
 
         $tester = new CodeTester();
@@ -133,26 +159,14 @@ class APIExercisesHandler
         // Checks if the tests were executed successfully
         // If not, we return the error message
         if (!$testResult->success) {
-            $response = [
-                "message" => $testResult->value,
-                "status" => "fail"
-            ];
-
-            echo json_encode($response);
-            exit;
+            $this->sendError($testResult->value, 200, "fail");
         }
 
         // If the code has been executed but returned an error
         // message,then we return the error message
         $codeExecutionResult = json_decode($testResult->value);
         if (is_null($codeExecutionResult)) {
-            $response = [
-                "message" => $testResult->value,
-                "status" => "fail"
-            ];
-
-            echo json_encode($response);
-            exit;
+            $this->sendError($testResult->value, 200, "fail");
         }
 
         // If the code has been executed successfully and
@@ -166,16 +180,13 @@ class APIExercisesHandler
             $this->handleExerciseDone($loginId, $exerciseId, $code);
         }
 
+        // Return the result of the code execution
         // If the code gets to here, it means that the code
         // has been executed successfully, but the tests has
         // failed. We still want to return the result of the
         // code execution, so we return the value of the test
         // result, which is the output of the code execution.
-        $response = [
-            "message" => $testResult->value,
-            "status" => "success"
-        ];
-        echo json_encode($response);
+        $this->sendSuccess(["message" => $testResult->value]);
     }
 
     private function handleExerciseDone($loginId, $exerciseId, $code)
@@ -197,23 +208,12 @@ class APIExercisesHandler
 
     private function handleGetRequest()
     {
-        $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-        if ($conn->connect_error) {
-            http_response_code(500);
-            echo json_encode(["status" => "error", "message" => "Database connection failed: " . $conn->connect_error]);
-            exit;
-        }
-
+        $conn = $this->getDbConnection();
         $token = $this->getBearerToken();
-
-        list($encodedPayload, $encodedSignature) = explode('.', $token);
-        $payloadJson = base64_decode(strtr($encodedPayload, '-_', '+/'));
-        $payload = json_decode($payloadJson, true);
-
+        $payload = $this->getPayloadFromToken($token);
         $loginId = intval($payload['sub'] ?? 0);
 
-        $sql = "select E.id, E.title, E.testfilename, E.instructions, COALESCE(UE.done, 0) as done, UE.code from exercise as E left join user_exercise as UE on E.id = UE.exerciseid and UE.loginid = $loginId";
-
+        $sql = "SELECT E.id, E.title, E.testfilename, E.instructions, COALESCE(UE.done, 0) as done, UE.code FROM exercise as E LEFT JOIN user_exercise as UE ON E.id = UE.exerciseid AND UE.loginid = $loginId";
         $result = $conn->query($sql);
         $exercises = [];
         if ($result && $result->num_rows > 0) {
@@ -222,8 +222,7 @@ class APIExercisesHandler
             }
         }
         $conn->close();
-        echo json_encode(["status" => "success", "exercises" => $exercises]);
-        exit;
+        $this->sendSuccess(["exercises" => $exercises]);
     }
 
     private function handleLogin($username, $password)
