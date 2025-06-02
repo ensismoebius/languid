@@ -1,28 +1,31 @@
 <?php
-require_once('isolate_config.php');
+require_once "Result.php";
+require_once "isolate_config.php";
 
 class CodeTester
 {
     private $code;
     private $exercise;
 
-    private function cppHasMain(string $filePath): bool
+    private function cppHasMain(string $filePath): Result
     {
         if (!is_readable($filePath)) {
-            throw new RuntimeException("File not readable: $filePath");
+            return new Result(false, "File not readable: {$filePath}");
         }
 
         $contents = file_get_contents($filePath);
 
         // Remove comments (both single-line and multi-line)
-        // $contents = preg_replace('~//.*?$|/\*.*?\*/~s', '', $contents);
         $contents = preg_replace('/^\/\*(.|\n)*\*\/$|^\/\/.*$/m', '', $contents);
 
         // Normalize whitespace
         $contents = preg_replace('/\s+/', ' ', $contents);
 
         // Search for any variant of main function signature
-        return preg_match('/\b(int|void)\s+main\s*\(\s*(.*?)\s*\)/', $contents) === 1;
+        return new Result(
+            true,
+            preg_match('/\b(int|void)\s+main\s*\(\s*(.*?)\s*\)/', $contents) === 1
+        );
     }
 
 
@@ -32,10 +35,10 @@ class CodeTester
         $this->exercise = $exercise;
     }
 
-    public function runTests()
+    public function runTests() : Result
     {
         if (!$this->code || !$this->exercise) {
-            return "Error: Code or exercise not set.";
+            return new Result(false, "Code or exercise not set.");
         }
 
         $tempCppFileName = uniqid() . ".cpp";
@@ -53,7 +56,7 @@ class CodeTester
         $imageExists = shell_exec($checkImageCmd);
 
         if (empty($imageExists)) {
-            return "Error: Sandbox Docker image not found. Contact the administrator.";
+            return new Result(false, "Error: Sandbox Docker image not found. Contact the administrator.");
         }
 
         $containerName = "sandbox" . uniqid();
@@ -62,7 +65,15 @@ class CodeTester
 
         // If cpp file has main function, we need to compile both the test and the code
         // and run the test file.
-        if ($this->cppHasMain($uploadPath)) {
+        $hasMain = $this->cppHasMain($uploadPath);
+
+        // If the check for main function fails, return the error
+        if(!$hasMain->success){
+            return $hasMain;
+        }
+
+        // If the cpp file has a main function, we compile both the code and the test file
+        if ($hasMain->value) {
             $dockerCmd = "docker run --rm --name $containerName -v $uploadPath:/tmp/code.cpp:ro -v $testFile:/tmp/test.cpp:ro sandbox bash -c '
             export LANG=en_US.UTF-8; \
             if ! g++ -std=c++20 /tmp/code.cpp -o /tmp/code_exec 2> /tmp/res.json; then \
@@ -91,7 +102,7 @@ class CodeTester
         shell_exec("rm $uploadPath");
         shell_exec("rm $execPath");
 
-        return $testOutput;
+        return new Result(true, $testOutput);
     }
 }
 

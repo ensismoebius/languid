@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "Debug Expo (Web)",
-      "type": "pwa-chrome",
+      "type": "chrome",
       "request": "launch",
       "url": "http://localhost:8081",
       "webRoot": "${workspaceFolder}",
@@ -11,9 +11,8 @@
     },
     {
       "name": "Debug Expo (Android)",
-      "type": "reactnative",
+      "type": "node",
       "request": "launch",
-      "platform": "android",
       "sourceMaps": true,
       "cwd": "${workspaceFolder}"
     },

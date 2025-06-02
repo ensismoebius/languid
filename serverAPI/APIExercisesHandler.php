@@ -130,18 +130,32 @@ class APIExercisesHandler
         $tester->setCodeAndExercise($code, $exercise);
         $testResult = $tester->runTests();
 
-        $testResultJson = json_decode($testResult ?? '{}');
+        if (!$testResult->success) {
+            $response = [
+                "message" => $testResult->value,
+                "status" => "fail"
+            ];
+
+            echo json_encode($response);
+            exit;
+        }
+
+        $codeExecutionResult = json_decode($testResult->value);
 
         if (
-            $testResultJson?->failures == 0 &&
+            $codeExecutionResult->failures == 0 &&
             $loginId !== null &&
             $exerciseId !== "0"
         ) {
             $this->handleExerciseDone($loginId, $exerciseId, $code);
         }
-        $response = ["message" => $testResult ?? "No output", "status" => is_null($testResult) ? "fail" : "success"];
+
+
+        $response = [
+            "message" => $testResult->value ?? "No output",
+            "status" => is_null($testResult) ? "fail" : "success"
+        ];
         echo json_encode($response);
-        exit;
     }
 
     private function handleExerciseDone($loginId, $exerciseId, $code)
