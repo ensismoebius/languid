@@ -6,7 +6,7 @@ read -p "Enter the database login: " DB_LOGIN
 read -s -p "Enter the database password: " DB_PASSWORD
 
 echo
-read -p "Enter the user's email: " EMAIL
+read -p "Enter the user's first and last name in the format: <first name>.<last name> " EMAIL
 read -s -p "Enter the user's password: " PASSWORD
 
 echo

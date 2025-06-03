@@ -74,6 +74,12 @@ CREATE TABLE IF NOT EXISTS exerciseGroup (
   description text NOT NULL
 );
 
+# Insert default groups if not exists
+INSERT INTO exerciseGroup (name, description) VALUES
+  ('Group01', 'Default group 01'),
+  ('Group02', 'Default group 02')
+ON DUPLICATE KEY UPDATE name=name;
+
 CREATE TABLE IF NOT EXISTS exercise (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -123,7 +129,18 @@ mysql -h "$DB_HOST" -u "$DB_LOGIN" -p"$DB_PASSWORD" < insert_default_user.sql
 rm insert_default_user.sql
 
 
-CSV_FILE="alunos.csv"
+
+# Only run the CSV import if a CSV file is provided as an argument
+if [[ -z "$1" ]]; then
+    echo "Usage: $0 <csv_file>"
+    echo "You must provide the path to the CSV file as the first argument."
+    exit 1
+fi
+
+CSV_FILE="$1"
+
+# Prompt for groupId for all users in this CSV
+read -p "Enter the groupId for all users in $CSV_FILE: " GROUP_ID
 
 while IFS=$'\t' read -r RM NOME GRUPO; do
     # Pula o cabeçalho
@@ -137,8 +154,8 @@ while IFS=$'\t' read -r RM NOME GRUPO; do
     # Gera hash MD5 da RM
     HASH=$(echo -n "$RM" | md5sum | awk '{print $1}')
 
-    # Insere no banco
+    # Insere no banco, agora com groupId
     mysql -u "$DB_LOGIN" -p"$DB_PASSWORD" languid -e \
-    "INSERT INTO user (email, passwdHash) VALUES ('$EMAIL', '$HASH') ON DUPLICATE KEY UPDATE email=email;"
+    "INSERT INTO user (email, passwdHash, groupId) VALUES ('$EMAIL', '$HASH', $GROUP_ID) ON DUPLICATE KEY UPDATE email=email, groupId=$GROUP_ID;"
 done < "$CSV_FILE"
 
