@@ -209,11 +209,13 @@ class APIExercisesHandler
     private function handleGetRequest()
     {
         $conn = $this->getDbConnection();
-        $token = $this->getBearerToken();
-        $payload = $this->getPayloadFromToken($token);
+        $payload = $this->getPayloadFromToken($this->getBearerToken());
         $loginId = intval($payload['sub'] ?? 0);
 
-        $sql = "SELECT E.id, E.title, E.testfilename, E.instructions, COALESCE(UE.done, 0) as done, UE.code FROM exercise as E LEFT JOIN user_exercise as UE ON E.id = UE.exerciseid AND UE.loginid = $loginId";
+        // $sql = "SELECT E.id, E.title, E.testfilename, E.instructions, E.groupId, COALESCE(UE.done, 0) as done, UE.code FROM exercise as E LEFT JOIN user_exercise as UE ON E.id = UE.exerciseid AND UE.loginid = $loginId";
+
+        $sql = "SELECT E.id, E.title, E.testfilename, E.instructions, E.groupId, COALESCE(UE.done, 0) as done, UE.code FROM exercise as E LEFT JOIN user_exercise as UE ON E.id = UE.exerciseid AND UE.loginid = $loginId WHERE E.groupId = ( SELECT groupId FROM user  WHERE id = $loginId LIMIT 1 )";
+
         $result = $conn->query($sql);
         $exercises = [];
         if ($result && $result->num_rows > 0) {

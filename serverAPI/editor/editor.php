@@ -95,11 +95,27 @@ function connectDB()
     return $conn;
 }
 
+// Get all exercise groups
+function getExerciseGroups()
+{
+    $conn = connectDB();
+    $sql = "SELECT id, name, description FROM exerciseGroup ORDER BY id ASC";
+    $result = $conn->query($sql);
+    $groups = [];
+    if ($result && $result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $groups[] = $row;
+        }
+    }
+    $conn->close();
+    return $groups;
+}
+
 // Get all exercises
 function getExercises()
 {
     $conn = connectDB();
-    $sql = "SELECT id, title, instructions, testFileName FROM exercise ORDER BY id ASC";
+    $sql = "SELECT id, title, instructions, testFileName, groupId FROM exercise ORDER BY id ASC";
     $result = $conn->query($sql);
 
     $exercises = [];
@@ -110,14 +126,16 @@ function getExercises()
     }
 
     $conn->close();
-    echo json_encode(["status" => "success", "exercises" => $exercises]);
+    // Also return groups for the form
+    $groups = getExerciseGroups();
+    echo json_encode(["status" => "success", "exercises" => $exercises, "groups" => $groups]);
 }
 
 // Get specific exercise
 function getExercise($id)
 {
     $conn = connectDB();
-    $stmt = $conn->prepare("SELECT id, title, instructions, testFileName FROM exercise WHERE id = ?");
+    $stmt = $conn->prepare("SELECT id, title, instructions, testFileName, groupId FROM exercise WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -140,7 +158,9 @@ function getExercise($id)
     }
 
     $conn->close();
-    echo json_encode(["status" => "success", "exercise" => $exercise]);
+    // Also return groups for the form
+    $groups = getExerciseGroups();
+    echo json_encode(["status" => "success", "exercise" => $exercise, "groups" => $groups]);
 }
 
 // Create a new exercise
@@ -148,7 +168,7 @@ function createExercise()
 {
     $data = json_decode(file_get_contents("php://input"), true);
 
-    if (!isset($data['title']) || !isset($data['instructions']) || !isset($data['testFileContent'])) {
+    if (!isset($data['title']) || !isset($data['instructions']) || !isset($data['testFileContent']) || !isset($data['groupId'])) {
         http_response_code(400);
         echo json_encode(["status" => "error", "message" => "Missing required fields"]);
         exit;
@@ -163,8 +183,8 @@ function createExercise()
     $testFileName = $nextId . "_test.cpp";
 
     // Insert the new exercise
-    $stmt = $conn->prepare("INSERT INTO exercise (title, instructions, testFileName) VALUES (?, ?, ?)");
-    $stmt->bind_param("sss", $data['title'], $data['instructions'], $testFileName);
+    $stmt = $conn->prepare("INSERT INTO exercise (title, instructions, testFileName, groupId) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("sssi", $data['title'], $data['instructions'], $testFileName, $data['groupId']);
 
     if (!$stmt->execute()) {
         $conn->close();
@@ -201,7 +221,7 @@ function updateExercise($id)
 {
     $data = json_decode(file_get_contents("php://input"), true);
 
-    if (!isset($data['title']) || !isset($data['instructions']) || !isset($data['testFileContent'])) {
+    if (!isset($data['title']) || !isset($data['instructions']) || !isset($data['testFileContent']) || !isset($data['groupId'])) {
         http_response_code(400);
         echo json_encode(["status" => "error", "message" => "Missing required fields"]);
         exit;
@@ -226,8 +246,8 @@ function updateExercise($id)
     $testFileName = $exercise['testFileName'];
 
     // Update the exercise
-    $stmt = $conn->prepare("UPDATE exercise SET title = ?, instructions = ? WHERE id = ?");
-    $stmt->bind_param("ssi", $data['title'], $data['instructions'], $id);
+    $stmt = $conn->prepare("UPDATE exercise SET title = ?, instructions = ?, groupId = ? WHERE id = ?");
+    $stmt->bind_param("ssii", $data['title'], $data['instructions'], $data['groupId'], $id);
 
     if (!$stmt->execute()) {
         $conn->close();

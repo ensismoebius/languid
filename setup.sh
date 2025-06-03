@@ -68,18 +68,28 @@ cat <<EOL > create_database.sql
 CREATE DATABASE IF NOT EXISTS languid;
 USE languid;
 
+CREATE TABLE IF NOT EXISTS exerciseGroup (
+  id int primary key auto_increment, 
+  name varchar(50) NOT NULL,
+  description text NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS exercise (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     instructions TEXT NOT NULL,
-    testFileName VARCHAR(255) NOT NULL
+    testFileName VARCHAR(255) NOT NULL,
+    groupId INT NOT NULL,
+    FOREIGN KEY (groupId) REFERENCES exerciseGroup(id)
 );
 
 CREATE TABLE IF NOT EXISTS user (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     passwdHash VARCHAR(255) NOT NULL,
-    admin BOOLEAN DEFAULT FALSE
+    admin BOOLEAN DEFAULT FALSE,
+    groupId INT NOT NULL,
+    FOREIGN KEY (groupId) REFERENCES exerciseGroup(id)
 );
 
 CREATE TABLE IF NOT EXISTS user_exercise (

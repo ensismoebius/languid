@@ -134,6 +134,31 @@
             color: #61dafb;
         }
 
+        /* Style for the group select dropdown */
+        select#group-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: #1e1e1e;
+            color: #e4e4e4;
+            box-sizing: border-box;
+            margin-bottom: 0;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        select#group-select:focus {
+            outline: none;
+            border-color: #61dafb;
+            box-shadow: 0 0 5px rgba(97, 218, 251, 0.5);
+        }
+
+        select#group-select option {
+            background: #252526;
+            color: #e4e4e4;
+        }
+
         input[type="text"],
         input[type="password"],
         textarea {
@@ -297,6 +322,10 @@
                             <label for="instructions">Instructions:</label>
                             <textarea id="instructions" name="instructions"></textarea>
                         </div>
+                        <div class="form-group">
+                            <label for="group-select">Group:</label>
+                            <select id="group-select" name="group-select"></select>
+                        </div>
                         <div class="form-group code-area">
                             <label for="test-file">Test File (C++):</label>
                             <textarea id="test-file" name="test-file" class="code-editor"></textarea>
@@ -337,6 +366,7 @@
         const loginError = document.getElementById('login-error');
         const refreshExercisesBtn = document.getElementById('refresh-exercises-btn');
         const newExerciseBtn = document.getElementById('new-exercise-btn');
+        const groupSelect = document.getElementById('group-select');
 
         // Check if user is logged in
         function checkAuth()
@@ -413,8 +443,7 @@
         // Fetch all exercises
         async function fetchExercises()
         {
-            try
-            {
+            try {
                 const response = await fetch('editor.php', {
                     method: 'GET',
                     headers: {
@@ -422,21 +451,37 @@
                         'X-API-KEY': API_KEY
                     }
                 });
-
                 const data = await response.json();
-
-                if (data.status === 'success')
-                {
+                if (data.status === 'success') {
                     displayExercises(data.exercises);
-                } else
-                {
-                    // Handle error
+                    populateGroupSelect(data.groups);
+                } else {
                     console.error('Failed to fetch exercises:', data.message);
                 }
-            } catch (error)
-            {
+            } catch (error) {
                 console.error('Error fetching exercises:', error);
             }
+        function populateGroupSelect(groups) {
+            groupSelect.innerHTML = '';
+            if (!groups) return;
+            groups.forEach(group => {
+                const option = document.createElement('option');
+                option.value = group.id;
+                option.textContent = group.name;
+                groupSelect.appendChild(option);
+            });
+        }
+        }
+
+        function populateGroupSelect(groups) {
+            groupSelect.innerHTML = '';
+            if (!groups) return;
+            groups.forEach(group => {
+                const option = document.createElement('option');
+                option.value = group.id;
+                option.textContent = group.name;
+                groupSelect.appendChild(option);
+            });
         }
 
         // Display exercises in the list
@@ -456,8 +501,7 @@
         // Fetch a specific exercise
         async function fetchExercise(id)
         {
-            try
-            {
+            try {
                 const response = await fetch(`editor.php/${id}`, {
                     method: 'GET',
                     headers: {
@@ -465,19 +509,13 @@
                         'X-API-KEY': API_KEY
                     }
                 });
-
                 const data = await response.json();
-
-                if (data.status === 'success')
-                {
-                    displayExerciseForm(data.exercise);
-                } else
-                {
-                    // Handle error
+                if (data.status === 'success') {
+                    displayExerciseForm(data.exercise, data.groups);
+                } else {
                     console.error('Failed to fetch exercise:', data.message);
                 }
-            } catch (error)
-            {
+            } catch (error) {
                 console.error('Error fetching exercise:', error);
             }
         }
@@ -485,24 +523,27 @@
         // Display the exercise form with data
         function displayExerciseForm(exercise = null)
         {
-            if (exercise)
-            {
+            // If groups are provided, update the select
+            if (arguments.length > 1 && arguments[1]) {
+                populateGroupSelect(arguments[1]);
+            }
+            if (exercise) {
                 formTitle.textContent = 'Edit Exercise';
                 exerciseIdInput.value = exercise.id;
                 titleInput.value = exercise.title;
                 instructionsInput.value = exercise.instructions;
                 testFileInput.value = exercise.testFileContent;
+                if (exercise.groupId) groupSelect.value = exercise.groupId;
                 deleteBtn.classList.remove('hidden');
-            } else
-            {
+            } else {
                 formTitle.textContent = 'New Exercise';
                 exerciseIdInput.value = '';
                 titleInput.value = '';
                 instructionsInput.value = '';
                 testFileInput.value = '';
+                if (groupSelect.options.length > 0) groupSelect.selectedIndex = 0;
                 deleteBtn.classList.add('hidden');
             }
-
             formMessage.classList.add('hidden');
         }
 
@@ -513,19 +554,15 @@
             const title = titleInput.value;
             const instructions = instructionsInput.value;
             const testFileContent = testFileInput.value;
-
-            if (!title || !instructions || !testFileContent)
-            {
+            const groupId = groupSelect.value;
+            if (!title || !instructions || !testFileContent || !groupId) {
                 showFormMessage('Please fill in all fields', 'error');
                 return;
             }
-
             const isNewExercise = !id;
             const url = isNewExercise ? 'editor.php' : `editor.php/${id}`;
             const method = isNewExercise ? 'POST' : 'PUT';
-
-            try
-            {
+            try {
                 const response = await fetch(url, {
                     method: method,
                     headers: {
@@ -533,21 +570,16 @@
                         'Authorization': `Bearer ${token}`,
                         'X-API-KEY': API_KEY
                     },
-                    body: JSON.stringify({ title, instructions, testFileContent })
+                    body: JSON.stringify({ title, instructions, testFileContent, groupId })
                 });
-
                 const data = await response.json();
-
-                if (data.status === 'success')
-                {
+                if (data.status === 'success') {
                     showFormMessage(data.message, 'success');
                     fetchExercises(); // Refresh exercise list immediately
-                } else
-                {
+                } else {
                     showFormMessage(data.message || 'Failed to save exercise', 'error');
                 }
-            } catch (error)
-            {
+            } catch (error) {
                 showFormMessage('An error occurred while saving', 'error');
                 console.error(error);
             }
