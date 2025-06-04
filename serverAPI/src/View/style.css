@@ -1,0 +1,265 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    color: #e4e4e4;
+    background-color: #1e1e1e;
+    height: 100vh;
+    /* Make body take full viewport height */
+    overflow: hidden;
+    /* Prevent scrolling on body */
+}
+
+.exercise-list li.selected {
+    background-color: #007acc;
+    color: white;
+}
+
+#form-title {
+    font-weight: bolder;
+}
+
+.container {
+    max-width: 1200px;
+    height: 100vh;
+    /* Full viewport height */
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    /* Include padding in height calculation */
+    display: flex;
+    flex-direction: column;
+}
+
+.login-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #333;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    background-color: #252526;
+}
+
+/* Two-column layout */
+.editor-layout {
+    display: flex;
+    gap: 20px;
+    height: 100%;
+    /* Take full height of container */
+    overflow: hidden;
+    /* Prevent layout overflow */
+}
+
+.sidebar {
+    width: 300px;
+    min-width: 250px;
+    background-color: #252526;
+    border-radius: 5px;
+    border: 1px solid #333;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    height: 100%;
+    /* Full height */
+}
+
+.content-area {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    /* Full height */
+    display: flex;
+    flex-direction: column;
+}
+
+.exercise-list {
+    list-style: none;
+    padding: 0;
+    overflow-y: auto;
+    flex-grow: 1;
+    /* Take remaining space */
+    margin: 0;
+}
+
+.exercise-list li {
+    padding: 12px 15px;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.exercise-list li:hover {
+    background-color: #2a2d2e;
+}
+
+.exercise-form {
+    padding: 20px;
+    border: 1px solid #333;
+    border-radius: 5px;
+    background-color: #252526;
+    flex-grow: 1;
+    /* Take remaining space */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group.code-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    /* Allow proper flex shrinking */
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #61dafb;
+}
+
+/* Style for the group select dropdown */
+select#group-select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: #1e1e1e;
+    color: #e4e4e4;
+    box-sizing: border-box;
+    margin-bottom: 0;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+select#group-select:focus {
+    outline: none;
+    border-color: #61dafb;
+    box-shadow: 0 0 5px rgba(97, 218, 251, 0.5);
+}
+
+select#group-select option {
+    background: #252526;
+    color: #e4e4e4;
+}
+
+input[type="text"],
+input[type="password"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: #1e1e1e;
+    color: #e4e4e4;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+textarea:focus {
+    outline: none;
+    border-color: #61dafb;
+    box-shadow: 0 0 5px rgba(97, 218, 251, 0.5);
+}
+
+textarea {
+    font-family: 'Consolas', 'Courier New', monospace;
+}
+
+#instructions {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.code-editor {
+    flex-grow: 1;
+    /* Take all available space */
+    font-family: 'Consolas', 'Courier New', monospace;
+    resize: none;
+    /* No need for resize with flex layout */
+}
+
+.btn {
+    padding: 10px 15px;
+    background-color: #0e639c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 10px;
+    transition: background-color 0.2s;
+}
+
+.btn:hover {
+    background-color: #1177bb;
+}
+
+.btn-danger {
+    background-color: #e51400;
+}
+
+.btn-danger:hover {
+    background-color: #f71700;
+}
+
+.btn-success {
+    background-color: #107c10;
+}
+
+.btn-success:hover {
+    background-color: #13a313;
+}
+
+.hidden {
+    display: none;
+}
+
+.error {
+    color: #f48771;
+    margin-top: 10px;
+}
+
+.success {
+    color: #89d185;
+    margin-top: 10px;
+}
+
+.action-buttons {
+    margin-top: 20px;
+}
+
+.nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.sidebar-actions {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+h2 {
+    color: #61dafb;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+
+#editor-section {
+    height: 100%;
+    /* Full height when visible */
+    display: flex;
+    flex-direction: column;
+}

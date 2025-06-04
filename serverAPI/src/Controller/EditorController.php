@@ -10,21 +10,33 @@ class EditorController
 
     public static function open($request, $params)
     {
-        // Serve the editor HTML file from View
-        $file = __DIR__ . '/../View/index.html';
-        if (!file_exists($file)) {
+        // Render the editor HTML file using Twig and AssetExtension
+        $viewDir = __DIR__ . '/../View';
+        $templateFile = 'index.html';
+        if (!file_exists($viewDir . '/' . $templateFile)) {
             return new Response(404, [], 'Editor not found');
         }
-        $html = file_get_contents($file);
+
+        // Twig setup
+        $loader = new \Twig\Loader\FilesystemLoader($viewDir);
+        $twig = new \Twig\Environment($loader);
+
+        // Register AssetExtension (res() function)
+        $assetBasePath = '/languid/serverAPI/src/View';
+        // Try both namespaces for AssetExtension
+        if (class_exists('Src\\Lib\\TwigPlugin\\AssetExtension')) {
+            $twig->addExtension(new \Src\Lib\TwigPlugin\AssetExtension($assetBasePath));
+        } elseif (class_exists('Languid\\Lib\\TwigPlugin\\AssetExtension')) {
+            $twig->addExtension(new \Languid\Lib\TwigPlugin\AssetExtension($assetBasePath));
+        }
+
+        $html = $twig->render($templateFile);
         return new Response(200, ['Content-Type' => 'text/html'], $html);
     }
 
     // --- API logic from old editor.php ---
     public static function api($request, $params)
     {
-        // Set headers (already handled globally, but can be set here if needed)
-        // HttpHelper::setDefaultHeaders();
-
         // Only allow authenticated admins
         self::verifyAdmin($request);
 
@@ -61,55 +73,53 @@ class EditorController
     // --- Helper methods (migrated from editor.php) ---
     private static function verifyAdmin($request)
     {
-        $headers = HttpHelper::getHeaders();
-        $authHeader = $headers['authorization'] ?? '';
-        if (preg_match('/Bearer\s(.*)/', $authHeader, $matches)) {
-            $token = $matches[1];
-            $authHandler = new \Languid\Lib\AuthHandler();
-            $authHandler->connect();
-            if (!$authHandler->verifyToken($token)) {
-                http_response_code(401);
-                echo json_encode(["status" => "error", "message" => "Unauthorized"]);
-                exit;
-            }
-            $parts = explode('.', $token);
-            if (count($parts) !== 2) {
-                http_response_code(401);
-                echo json_encode(["status" => "error", "message" => "Invalid token format"]);
-                exit;
-            }
-            list($encodedPayload, $encodedSignature) = $parts;
-            $payloadJson = base64_decode(strtr($encodedPayload, '-_', '+/'));
-            $payload = json_decode($payloadJson, true);
-            $userId = $payload['sub'] ?? null;
-            if (!$userId) {
-                http_response_code(401);
-                echo json_encode(["status" => "error", "message" => "Invalid token content"]);
-                exit;
-            }
-            $conn = Database::getInstance()->getConnection();
-            $stmt = $conn->prepare("SELECT admin FROM user WHERE id = ?");
-            $stmt->bind_param("i", $userId);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            if ($result->num_rows === 0) {
-                $conn->close();
-                http_response_code(401);
-                echo json_encode(["status" => "error", "message" => "User not found"]);
-                exit;
-            }
-            $user = $result->fetch_assoc();
-            $conn->close();
-            if ($user['admin'] != 1) {
-                http_response_code(403);
-                echo json_encode(["status" => "error", "message" => "Administrator access required"]);
-                exit;
-            }
-            return true;
+        $token = HttpHelper::getBearerToken($request);
+        if (!$token) {
+            http_response_code(401);
+            echo json_encode(["status" => "error", "message" => "Authorization required"]);
+            exit;
         }
-        http_response_code(401);
-        echo json_encode(["status" => "error", "message" => "Authorization required"]);
-        exit;
+        $authHandler = new \Languid\Lib\AuthHandler();
+        $authHandler->connect();
+        if (!$authHandler->verifyToken($token)) {
+            http_response_code(401);
+            echo json_encode(["status" => "error", "message" => "Unauthorized"]);
+            exit;
+        }
+        $parts = explode('.', $token);
+        if (count($parts) !== 2) {
+            http_response_code(401);
+            echo json_encode(["status" => "error", "message" => "Invalid token format"]);
+            exit;
+        }
+        list($encodedPayload, $encodedSignature) = $parts;
+        $payloadJson = base64_decode(strtr($encodedPayload, '-_', '+/'));
+        $payload = json_decode($payloadJson, true);
+        $userId = $payload['sub'] ?? null;
+        if (!$userId) {
+            http_response_code(401);
+            echo json_encode(["status" => "error", "message" => "Invalid token content"]);
+            exit;
+        }
+        $conn = Database::getInstance()->getConnection();
+        $stmt = $conn->prepare("SELECT admin FROM user WHERE id = ?");
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows === 0) {
+            $conn->close();
+            http_response_code(401);
+            echo json_encode(["status" => "error", "message" => "User not found"]);
+            exit;
+        }
+        $user = $result->fetch_assoc();
+        $conn->close();
+        if ($user['admin'] != 1) {
+            http_response_code(403);
+            echo json_encode(["status" => "error", "message" => "Administrator access required"]);
+            exit;
+        }
+        return true;
     }
 
     private static function connectDB()
