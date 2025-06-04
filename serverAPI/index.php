@@ -15,7 +15,7 @@ use Languid\Lib\HttpHelper;
 // Set CORS and content headers using HttpHelper
 HttpHelper::setDefaultHeaders();
 
-$router = new Router();
+$router = new Router('/languid/serverAPI');
 
 // Register a catch-all OPTIONS handler for CORS preflight
 $router->add('OPTIONS', '/{any}', [PreflightController::class, 'handle']);
