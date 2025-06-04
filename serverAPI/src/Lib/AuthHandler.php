@@ -4,7 +4,7 @@ namespace Languid\Lib;
 class AuthHandler
 {
     private $db;
-    private $secretKey = 'your-secret-key';
+    private $secretKey = API_KEY; // Use a constant or environment variable for the secret key
 
     public function connect()
     {

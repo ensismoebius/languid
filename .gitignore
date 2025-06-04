@@ -1,3 +1,6 @@
+# .lock files
+*.lock
+
 # Ignore node_modules and vendor directories
 node_modules/
 vendor/

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Exercícios Realizados</title>
+    <style>
+        body { font-family: Arial, sans-serif; color: #222; }
+        h1 { color: #007acc; }
+        .exercise { margin-bottom: 30px; }
+        .exercise-title { color: #333; margin-bottom: 5px; }
+        .exercise-instructions { margin-bottom: 10px; }
+        .exercise-answer { background: #f4f4f4; padding: 10px; border-radius: 4px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>Exercícios Realizados</h1>
+    <p><b>Usuário:</b> {{ user.email }} | <b>Grupo:</b> {{ user.groupId }}<br><b>Data:</b> {{ date }}</p>
+    {% for ex in exercises %}
+        <div class="exercise">
+            <h2 class="exercise-title">Exercício #{{ ex.id }}: {{ ex.title }}</h2>
+            <div class="exercise-instructions"><b>Enunciado:</b><br>{{ ex.instructions|nl2br }}</div>
+            <div><b>Resposta do usuário:</b><br><pre class="exercise-answer">{{ ex.code }}</pre></div>
+        </div>
+    {% else %}
+        <p>Nenhum exercício realizado encontrado.</p>
+    {% endfor %}
+</body>
+</html>

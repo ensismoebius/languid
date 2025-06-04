@@ -1,5 +1,5 @@
 <?php
-namespace Languid\Controller;
+namespace Languid\Lib;
 
 class Result {
     public bool $success;

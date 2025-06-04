@@ -2,7 +2,10 @@
 
 namespace Languid\Lib;
 
+
 use Mpdf\Mpdf;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
 class ExportUserExercisesPDF
 {
@@ -56,21 +59,23 @@ class ExportUserExercisesPDF
         $user = self::getUserInfo($userId);
         $exercises = self::getUserExercisesWithAnswers($userId);
         $mpdf = new Mpdf();
-        $html = '<h1>Exercícios Realizados</h1>';
-        $html .= '<p><b>Usuário:</b> ' . htmlspecialchars($user['email']) . ' | <b>Grupo:</b> ' . htmlspecialchars($user['groupId']) . '</p>';
-        foreach ($exercises as $ex) {
-            $html .= '<div style="margin-bottom:30px;">';
-            $html .= '<h2>Exercício #' . $ex['id'] . ': ' . htmlspecialchars($ex['title']) . '</h2>';
-            $html .= '<p><b>Enunciado:</b><br>' . nl2br(htmlspecialchars($ex['instructions'])) . '</p>';
-            $html .= '<p><b>Resposta do usuário:</b><br><pre style="background:#f4f4f4;padding:10px;border-radius:4px;">' . htmlspecialchars($ex['code']) . '</pre></p>';
-            $html .= '</div>';
-        }
-        if ($template) {
-            // Optionally wrap in a template
-            $html = str_replace('{{content}}', $html, $template);
-        }
-        $mpdf->WriteHTML($html);
+
+        // Setup Twig
+        $loader = new FilesystemLoader(__DIR__ . '/../View');
+        $twig = new Environment($loader);
+
+        // Default template if none provided
+        $templateFile = $template ?: 'user_exercises_pdf.html.twig';
+
+        // Render HTML with Twig/../../templates
+        $html = $twig->render($templateFile, [
+            'user' => $user,
+            'exercises' => $exercises,
+            'date' => date('d/m/Y H:i')
+        ]);
+
         $filename = 'user_' . $userId . '_exercises_' . date('Ymd_His') . '.pdf';
+        $mpdf->WriteHTML($html);
         $mpdf->Output($filename, \Mpdf\Output\Destination::INLINE);
     }
 }
