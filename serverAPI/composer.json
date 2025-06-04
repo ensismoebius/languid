@@ -1,0 +1,15 @@
+{
+    "name": "languid/serverapi",
+    "require": {
+        "mpdf/mpdf": "^8.2",
+        "twig/twig": "^3.21"
+    },
+    "autoload": {
+        "psr-4": {
+            "Languid\\": "src/"
+        },
+        "files": [
+            "config.php"
+        ]
+    }
+}

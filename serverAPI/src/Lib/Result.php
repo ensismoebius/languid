@@ -1,4 +1,6 @@
 <?php
+namespace Languid\Controller;
+
 class Result {
     public bool $success;
     public mixed $value;

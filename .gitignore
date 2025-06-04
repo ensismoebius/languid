@@ -1,3 +1,7 @@
+# Ignore node_modules and vendor directories
+node_modules/
+vendor/
+
 # Ignore database scripts
 create_database.sql
 insert_default_user.sql

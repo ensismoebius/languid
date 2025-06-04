@@ -1,5 +1,5 @@
 <?php
-require_once 'isolate_config.php';
+namespace Languid\Lib;
 
 class AuthHandler
 {
@@ -9,13 +9,13 @@ class AuthHandler
     public function connect()
     {
         try {
-            $this->db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-        } catch (Exception $e) {
+            $this->db = new \mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        } catch (\Exception $e) {
             return "Connection failed: " . $e->getMessage();
         }
 
         // Check connection
-        $this->db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        $this->db = new \mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         if ($this->db->connect_error) {
             return "Connection failed: " . $this->db->connect_error;
         }

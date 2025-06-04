@@ -1,11 +1,11 @@
 <?php
-require_once 'CodeTester.php';
-require_once 'AuthHandler.php';
-require_once 'isolate_config.php';
+namespace Languid;
+
+use Languid\Controller\AuthHandler;
+use Languid\Controller\CodeTester;
 
 class APIExercisesHandler
 {
-    const API_KEY = "re98wr6ew8r6rew76r89e6rwer6w98r6ywe9r6r6w87e9wr6ew06r7";
 
     public function handleRequest()
     {
@@ -63,7 +63,7 @@ class APIExercisesHandler
     // Helper: get DB connection or send error
     private function getDbConnection()
     {
-        $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        $conn = new \mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         if ($conn->connect_error) {
             $this->sendError("Database connection failed: " . $conn->connect_error, 500);
         }
@@ -191,7 +191,7 @@ class APIExercisesHandler
 
     private function handleExerciseDone($loginId, $exerciseId, $code)
     {
-        $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        $conn = new \mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         if ($conn->connect_error) {
             return;
         }
@@ -212,8 +212,6 @@ class APIExercisesHandler
         $payload = $this->getPayloadFromToken($this->getBearerToken());
         $loginId = intval($payload['sub'] ?? 0);
 
-        // $sql = "SELECT E.id, E.title, E.testfilename, E.instructions, E.groupId, COALESCE(UE.done, 0) as done, UE.code FROM exercise as E LEFT JOIN user_exercise as UE ON E.id = UE.exerciseid AND UE.loginid = $loginId";
-
         $sql = "SELECT E.id, E.title, E.testfilename, E.instructions, E.groupId, COALESCE(UE.done, 0) as done, UE.code FROM exercise as E LEFT JOIN user_exercise as UE ON E.id = UE.exerciseid AND UE.loginid = $loginId WHERE E.groupId = ( SELECT groupId FROM user  WHERE id = $loginId LIMIT 1 )";
 
         $result = $conn->query($sql);
@@ -229,7 +227,7 @@ class APIExercisesHandler
 
     private function handleLogin($username, $password)
     {
-        $authHandler = new AuthHandler();
+        $authHandler = new \Languid\Lib\AuthHandler();
         $connectionMessage = $authHandler->connect();
 
         if ($connectionMessage !== "Connected successfully") {

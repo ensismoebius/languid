@@ -1,6 +1,5 @@
 <?php
-require_once "Result.php";
-require_once "isolate_config.php";
+namespace Languid\Lib;
 
 class CodeTester
 {
@@ -35,7 +34,7 @@ class CodeTester
         $this->exercise = $exercise;
     }
 
-    public function runTests() : Result
+    public function runTests(): Result
     {
         if (!$this->code || !$this->exercise) {
             return new Result(false, "Code or exercise not set.");
@@ -68,7 +67,7 @@ class CodeTester
         $hasMain = $this->cppHasMain($uploadPath);
 
         // If the check for main function fails, return the error
-        if(!$hasMain->success){
+        if (!$hasMain->success) {
             return $hasMain;
         }
 
@@ -105,8 +104,3 @@ class CodeTester
         return new Result(true, $testOutput);
     }
 }
-
-// Example usage:
-// $tester = new CodeTester();
-// $tester->setCodeAndExercise($codeString, $exerciseName);
-// echo $tester->runTests();
