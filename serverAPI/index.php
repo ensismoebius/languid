@@ -4,6 +4,7 @@ require_once __DIR__ . '/config.php';
 
 use Languid\Lib\Router;
 use Languid\Controller\AuthController;
+use Languid\Controller\EditorController;
 use Languid\Controller\ExerciseController;
 use Languid\Controller\PDFController;
 use Languid\Controller\PreflightController;
@@ -18,6 +19,9 @@ $router = new Router();
 
 // Register a catch-all OPTIONS handler for CORS preflight
 $router->add('OPTIONS', '/{any}', [PreflightController::class, 'handle']);
+
+// Editor route (serves the HTML editor UI)
+$router->add('GET', '/editor', [EditorController::class, 'open']);
 
 // Auth routes
 $router->add('POST', '/login', [AuthController::class, 'login']);
