@@ -6,22 +6,18 @@ use Languid\Lib\Router;
 use Languid\Controller\AuthController;
 use Languid\Controller\ExerciseController;
 use Languid\Controller\PDFController;
+use Languid\Controller\PreflightController;
 use GuzzleHttp\Psr7\ServerRequest;
 use GuzzleHttp\Psr7\Response;
+use Languid\Lib\HttpHelper;
 
-// Set CORS and content headers
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, X-API-KEY");
-header("Content-Type: application/json");
-
-// Handle preflight
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
-}
+// Set CORS and content headers using HttpHelper
+HttpHelper::setDefaultHeaders();
 
 $router = new Router();
+
+// Register a catch-all OPTIONS handler for CORS preflight
+$router->add('OPTIONS', '/{any}', [PreflightController::class, 'handle']);
 
 // Auth routes
 $router->add('POST', '/login', [AuthController::class, 'login']);
@@ -39,9 +35,11 @@ $response = $router->dispatch($request);
 
 // Output response
 http_response_code($response->getStatusCode());
+
 foreach ($response->getHeaders() as $name => $values) {
     foreach ($values as $value) {
         header(sprintf('%s: %s', $name, $value), false);
     }
 }
+
 echo $response->getBody();

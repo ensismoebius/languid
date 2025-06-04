@@ -54,7 +54,7 @@ class ExportUserExercisesPDF
         return $info;
     }
 
-    function generatePDF($userId, $template = null)
+    public static function generatePDF($userId, $template = null)
     {
         $user = self::getUserInfo($userId);
         $exercises = self::getUserExercisesWithAnswers($userId);
