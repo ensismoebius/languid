@@ -1,7 +1,7 @@
 <?php
 namespace Languid\Controller;
 
-use GuzzleHttp\Psr7\Response;
+use Languid\Lib\Response;
 use Languid\Lib\HttpHelper;
 use Languid\Model\ExerciseModel;
 

@@ -1,41 +1,52 @@
-use Languid\Model\ExerciseAdminModel;
 <?php
 namespace Languid\Controller;
 
+use \Twig\Environment;
+use \Twig\Loader\FilesystemLoader;
+
 use GuzzleHttp\Psr7\Response;
+
 use Languid\Lib\HttpHelper;
 use Languid\Model\AdminModel;
 use Languid\Model\ExerciseAdminModel;
+use Languid\Lib\TwigPlugin\AssetExtension;
+
 class EditorController
 {
-
     public static function open($request, $params)
     {
         // Render the editor HTML file using Twig and AssetExtension
-        $viewDir = __DIR__ . '/../View';
         $templateFile = 'index.html';
-        if (!file_exists($viewDir . '/' . $templateFile)) {
-            return new Response(404, [], 'Editor not found');
+        if (!file_exists(EXERCISES_TEMPLATES_PATH . '/' . $templateFile)) {
+            return new Response(
+                404,
+                [],
+                'Editor not found'
+            );
         }
 
         // Twig setup
-        $loader = new \Twig\Loader\FilesystemLoader($viewDir);
-        $twig = new \Twig\Environment($loader);
+        $loader = new FilesystemLoader(EXERCISES_TEMPLATES_PATH);
+        $twig = new Environment($loader);
 
         // Register AssetExtension (res() function)
-        $assetBasePath = '/languid/serverAPI/src/View';
-        // Try both namespaces for AssetExtension
-        if (class_exists('Src\\Lib\\TwigPlugin\\AssetExtension')) {
-            $twig->addExtension(new \Src\Lib\TwigPlugin\AssetExtension($assetBasePath));
-        } elseif (class_exists('Languid\\Lib\\TwigPlugin\\AssetExtension')) {
-            $twig->addExtension(new \Languid\Lib\TwigPlugin\AssetExtension($assetBasePath));
-        }
+        $twig->addExtension(new AssetExtension(WEBSITE_ASSETS_URL));
 
         $html = $twig->render($templateFile);
-        return new Response(200, ['Content-Type' => 'text/html'], $html);
+
+        return new Response(
+            200,
+            ['Content-Type' => 'text/html'],
+            $html
+        );
     }
 
-    // --- API logic from old editor.php ---
+    /**
+     * Summary of api
+     * @param mixed $request
+     * @param mixed $params
+     * @return Response
+     */
     public static function api($request, $params)
     {
         // Only allow authenticated admins

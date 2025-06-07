@@ -23,7 +23,7 @@ class AuthHandler
         return "Connected successfully";
     }
 
-    public function authenticate($username, $passwdHash)
+    public function authenticate($username, $passwdHash) : string | null
     {
         $stmt = $this->db->prepare("SELECT id FROM user WHERE email = ? and passwdHash = ?");
         $stmt->bind_param("ss", $username, $passwdHash);

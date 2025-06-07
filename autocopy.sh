@@ -14,14 +14,21 @@ echo "Watching for changes in ./serverAPI/ and copying to /var/www/languid/";
 # Install inotify-tools if not already installed
 if ! command -v inotifywait &> /dev/null
 then
-    echo "inotify-tools could not be found, installing..."
-    apt-get update
-    apt-get install -y inotify-tools
+  echo "inotify-tools could not be found, installing..."
+  apt-get update
+  apt-get install -y inotify-tools
 fi
 
-inotifywait -qm -e close_write --format '%w%f' ./serverAPI/**.php | while read -r file; 
-do   
-    echo "Detected change in $file, copying to /var/www/languid/";
-    mkdir -p "/var/www/languid/serverAPI/";
-    cp "$file" "/var/www/languid/$file"; 
+echo "Lets copy files baby!"
+
+inotifywait -qm -r -e close_write --format '%w%f' ./serverAPI | \
+while read -r file; do
+  if [ "${file##*.}" = "php" ]; then
+    relpath="${file#./}"
+    dest="/var/www/languid/$relpath"
+    destdir="$(dirname "$dest")"
+    echo "Detected change in $file, copying to $dest";
+    mkdir -p "$destdir";
+    cp "$file" "$dest";
+  fi
 done

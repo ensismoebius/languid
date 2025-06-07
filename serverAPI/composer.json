@@ -2,8 +2,7 @@
     "name": "languid/serverapi",
     "require": {
         "mpdf/mpdf": "^8.2",
-        "twig/twig": "^3.21",
-        "guzzlehttp/psr7": "^2.7"
+        "twig/twig": "^3.21"
     },
     "autoload": {
         "psr-4": {

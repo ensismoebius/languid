@@ -5,7 +5,7 @@ namespace Languid\Lib;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use \GuzzleHttp\Psr7\Response;
+use Languid\Lib\Response;
 
 
 class Router
@@ -56,9 +56,8 @@ class Router
         }
 
         // 404 Response
-        $response = new Response(404);
-        $response->getBody()->write(json_encode(['status' => 'error', 'message' => 'Not Found']));
-        return $response->withHeader('Content-Type', 'application/json');
+        $response = new Response(404, ['Content-Type' => 'application/json'], json_encode(['status' => 'error', 'message' => 'Not Found']));
+        return $response;
     }
 
     private function match(string $routePath, string $requestPath, &$params): bool

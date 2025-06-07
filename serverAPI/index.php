@@ -3,28 +3,28 @@ require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/config.php';
 
 use Languid\Lib\Router;
+use Languid\Lib\HttpHelper;
+use Languid\Controller\PDFController;
 use Languid\Controller\AuthController;
 use Languid\Controller\EditorController;
 use Languid\Controller\ExerciseController;
-use Languid\Controller\PDFController;
 use Languid\Controller\PreflightController;
-use GuzzleHttp\Psr7\ServerRequest;
-use GuzzleHttp\Psr7\Response;
-use Languid\Lib\HttpHelper;
+
+use Languid\Lib\ServerRequest;
 
 // Set CORS and content headers using HttpHelper
 HttpHelper::setDefaultHeaders();
 
-$router = new Router('/languid/serverAPI');
+$router = new Router(WEBSITE_ROOT_PATH);
 
 // Register a catch-all OPTIONS handler for CORS preflight
 $router->add('OPTIONS', '/{any}', [PreflightController::class, 'handle']);
 
-// Editor route (serves the HTML editor UI)
-$router->add('GET', '/editor', [EditorController::class, 'open']);
-
 // Auth routes
 $router->add('POST', '/login', [AuthController::class, 'login']);
+
+// Editor route (serves the HTML editor UI)
+$router->add('GET', '/editor', [EditorController::class, 'open']);
 
 // Exercise routes
 $router->add('GET', '/exercises', [ExerciseController::class, 'list']);

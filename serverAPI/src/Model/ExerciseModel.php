@@ -2,7 +2,6 @@
 namespace Languid\Model;
 
 use Languid\Lib\Database;
-
 class ExerciseModel
 {
     public static function getExercisesForUser($loginId)

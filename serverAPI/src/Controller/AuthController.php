@@ -1,8 +1,7 @@
 <?php
 namespace Languid\Controller;
 
-
-use GuzzleHttp\Psr7\Response;
+use Languid\Lib\Response;
 use Languid\Lib\AuthHandler;
 
 class AuthController
